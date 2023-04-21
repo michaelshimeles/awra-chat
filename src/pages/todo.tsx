@@ -10,7 +10,10 @@ interface todoProps {
 }
 
 const todo: React.FC<todoProps> = ({ user }) => {
-  if (!user) return <Protected />;
+  if (!user)
+    return (
+      <Protected title="Protected Route" info="This is a protected route" />
+    );
   return (
     <Layout>
       <TodoListForm />

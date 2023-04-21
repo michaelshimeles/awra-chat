@@ -13,8 +13,12 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import Head from "next/head";
+import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 
-export default function Home() {
+interface HomeProps {
+}
+
+const Home: React.FC<HomeProps> = ({ }) => {
   return (
     <Layout>
       <Head>
@@ -50,4 +54,31 @@ export default function Home() {
       </VStack>
     </Layout>
   );
-}
+};
+
+export default Home;
+
+export const getServerSideProps = async (ctx: any) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx);
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  console.log("data", session);
+
+  if (!session)
+    return {
+      props: {
+        user: null,
+      },
+    };
+
+  return {
+    props: {
+      initialSession: session,
+      userServer: session.user,
+    },
+  };
+};

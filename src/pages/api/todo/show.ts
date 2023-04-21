@@ -12,6 +12,6 @@ export default async function handler(
 
     res.status(200).json(showTodoList);
   } catch (error) {
-    res.status(4040).json({ error: error });
+    res.status(404).json({ error: error });
   }
 }

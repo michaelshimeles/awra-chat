@@ -16,7 +16,6 @@ export default async function handler(
       },
     });
 
-    console.log(updateCompleted);
     res.status(200).json({ submitted: updateCompleted });
   } else {
     res.status(405).json({ error: "Method not allowed" });

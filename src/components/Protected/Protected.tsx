@@ -1,15 +1,30 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Layout from "../Layout/Layout";
-import { Center, Heading } from "@chakra-ui/react";
+import { Text, Heading, VStack } from "@chakra-ui/react";
+import { useRouter } from "next/router";
 
-interface ProtectedProps {}
+interface ProtectedProps {
+  title: string;
+  info: string;
+  forward: string
+}
 
-const Protected: React.FC<ProtectedProps> = ({}) => {
+const Protected: React.FC<ProtectedProps> = ({ title, info, forward }) => {
+
+  const router = useRouter()
+
+  useEffect(() => {
+    setTimeout(() => {
+      router.push(forward)
+    }, 2000)
+  }, [])
   return (
     <Layout>
-      <Center>
-        <Heading>Login to get access to this page</Heading>
-      </Center>
+      <VStack w="full" pt="3rem">
+        <Heading>{title}</Heading>
+        <Text>{info}</Text>
+        <Text>You are going to be redirected to another page</Text>
+      </VStack>
     </Layout>
   );
 };

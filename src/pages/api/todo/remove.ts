@@ -7,8 +7,6 @@ export default async function handler(
 ) {
   const prisma = new PrismaClient();
 
-  console.log(req.body);
-
   if (req.method === "POST") {
     const deleteTodoList = await prisma.todo.deleteMany({
       where: {
