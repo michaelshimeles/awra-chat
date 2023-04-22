@@ -22,6 +22,7 @@ interface ProfileImagePickerProps {
 }
 
 
+
 const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose, data }) => {
 
     const supabase = useSupabaseClient();
@@ -29,6 +30,7 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
     const [uploadSuccess, setUploadSuccess] = useState<boolean | null>(null)
     const [selected, setSelected] = useState<any>(null)
     const toast = useToast()
+
     const router = useRouter()
 
     function handleRefresh() {
@@ -116,7 +118,6 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
             .eq('user_id', data[0]?.user_id)
 
         if (profileImageData) {
-            console.log("profileImageData", profileImageData)
             return profileImageData
         }
 
@@ -180,7 +181,7 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
                                             border="4px solid"
                                             borderColor="white.700"
                                         >
-                                            <Image src={imageData?.publicUrl}  w={100} alt="uploaded" />
+                                            <Image src={imageData?.publicUrl} w={100} alt="uploaded" />
                                             <DeleteIcon onClick={() => handleImageDelete(image?.name)} _hover={
                                                 { cursor: "pointer" }
                                             } />
@@ -228,7 +229,11 @@ const profile: React.FC<profileProps> = ({ user, data }) => {
     const toast = useToast()
     const { isOpen, onOpen, onClose } = useDisclosure()
 
+    const refreshRouter = useRouter()
 
+    function handleRefresh() {
+        router.reload()
+    }
     if (!user)
         return (
             <Protected title="Protected Route" info="This is a protected route" forward='/' />
@@ -242,11 +247,11 @@ const profile: React.FC<profileProps> = ({ user, data }) => {
     const handleSignOut = async () => {
         const { error } = await supabase.auth.signOut();
         if (error) {
-
             return error;
         }
-
-        return "Signed out";
+        console.log("Signed out")
+        handleRefresh()
+        return;
     };
 
 
@@ -355,7 +360,7 @@ const profile: React.FC<profileProps> = ({ user, data }) => {
                     <Button rounded="none" variant="outline" onClick={() => router.push("/chat")}>Chat</Button>
                 </HStack>
                 <ProfileImagePicker isOpen={isOpen} onClose={onClose} data={data} />
-                <Friends />
+                <Friends data={data} />
             </VStack>
         </Layout>
     );
