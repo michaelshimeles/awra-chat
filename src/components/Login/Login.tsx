@@ -1,8 +1,8 @@
-import { Button, Center, HStack, Heading, Input, Text, VStack } from "@chakra-ui/react";
-import React from "react";
-import { useForm } from "react-hook-form";
+import { Button, HStack, Heading, Input, Text, VStack } from "@chakra-ui/react";
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { useRouter } from "next/router";
+import React from "react";
+import { useForm } from "react-hook-form";
 
 interface LoginProps { }
 
@@ -84,9 +84,9 @@ const Login: React.FC<LoginProps> = ({ }) => {
         </form>
       ) : (
         <HStack>
-          <Button onClick={handleSignOut} variant="outline" rounded="none" w="full">
+          {/* <Button onClick={handleSignOut} variant="outline" rounded="none" w="full">
             Log out
-          </Button>
+          </Button> */}
           <Button onClick={() => router.push("/profile")} variant="outline" rounded="none" w="full">
             Profile
           </Button>

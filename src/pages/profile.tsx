@@ -1,13 +1,13 @@
+import Friends from '@/components/Friends/Friends';
 import Layout from '@/components/Layout/Layout';
 import Protected from '@/components/Protected/Protected';
+import { DeleteIcon } from '@chakra-ui/icons';
 import { Avatar, Box, Button, Editable, EditableInput, EditablePreview, HStack, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, VStack, useDisclosure, useToast } from '@chakra-ui/react';
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
-import { DeleteIcon } from '@chakra-ui/icons'
-import Friends from '@/components/Friends/Friends';
 
 
 interface profileProps {
@@ -21,14 +21,15 @@ interface ProfileImagePickerProps {
     onClose: any
 }
 
-
-
 const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose, data }) => {
 
     const supabase = useSupabaseClient();
     const [images, setImages] = useState<any>(null)
     const [uploadSuccess, setUploadSuccess] = useState<boolean | null>(null)
     const [selected, setSelected] = useState<any>(null)
+    const [profileLoading, setProfileLoading] = useState<boolean>(false)
+    const [imageUploadLoading, setImageUploadLoading] = useState<boolean>(false)
+
     const toast = useToast()
 
     const router = useRouter()
@@ -66,6 +67,7 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
     const onSubmit = async (formData: any) => {
         setUploadSuccess(false)
         console.log(formData)
+        setImageUploadLoading(true)
 
         const avatarFileName = formData?.profile_img[0]?.name
 
@@ -93,6 +95,7 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
                 duration: 9000,
                 isClosable: true,
             })
+            setImageUploadLoading(false)
             return imgData
         }
 
@@ -111,6 +114,7 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
 
     const handleMakeProfilePic = async (image: string) => {
         // console.log("User ID", data[0]?.user_id)
+        setProfileLoading(true)
 
         const { data: profileImageData, error } = await supabase
             .from('profile')
@@ -118,6 +122,7 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
             .eq('user_id', data[0]?.user_id)
 
         if (profileImageData) {
+            setProfileLoading(false)
             return profileImageData
         }
 
@@ -152,15 +157,14 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
-            <ModalContent rounded="none" bgColor="gray.900">
-                <ModalHeader>Change your profile picture</ModalHeader>
-                <ModalCloseButton />
+            <ModalContent rounded="none" bgColor="blackAlpha.900" border="1px solid" borderColor="gray.700">
+                {!selected ? <ModalHeader>Image Gallery</ModalHeader> : <ModalHeader>Make it your Profile Picture or Delete It</ModalHeader>}
+                <ModalCloseButton rounded="none" />
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <ModalBody>
                         <VStack>
                             {images && <HStack wrap="wrap" pb={50} gap="1rem">
-                                {images?.map((image: any, index: number) => {
-
+                                {images?.map((image: any) => {
                                     const { data: imageData } = supabase
                                         .storage
                                         .from('profile')
@@ -178,8 +182,8 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
                                             onClick={() => {
                                                 setSelected(imageData?.publicUrl);
                                             }}
-                                            border="4px solid"
-                                            borderColor="white.700"
+                                            border="2px solid"
+                                            borderColor="whiteAlpha.700"
                                         >
                                             <Image src={imageData?.publicUrl} w={100} alt="uploaded" />
                                             <DeleteIcon onClick={() => handleImageDelete(image?.name)} _hover={
@@ -211,12 +215,12 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
                         }>
                             Close
                         </Button>
-                        {selected ? <Button variant="outline" rounded="none" onClick={() => {
+                        {selected ? <Button isLoading={profileLoading} variant="outline" rounded="none" onClick={() => {
                             handleMakeProfilePic(selected).then(() => {
                                 handleRefresh()
                             })
                             // onClose()
-                        }} w="100%">Make Profile Picture</Button> : <Button variant="outline" rounded="none" type='submit' w="100%">Upload</Button>}
+                        }} w="100%">Make Profile Picture</Button> : <Button variant="outline" isLoading={imageUploadLoading} rounded="none" type='submit' w="100%">Upload</Button>}
 
                     </ModalFooter>
                 </form>
@@ -232,7 +236,7 @@ const profile: React.FC<profileProps> = ({ user, data }) => {
     const refreshRouter = useRouter()
 
     function handleRefresh() {
-        router.reload()
+        refreshRouter.reload()
     }
     if (!user)
         return (
@@ -338,25 +342,24 @@ const profile: React.FC<profileProps> = ({ user, data }) => {
         <Layout>
             <VStack pt="15rem" px="2rem">
                 <HStack border="1px solid" rounded="sm" p="2rem" gap="1rem" borderColor="gray.900" w={["15rem", "25rem"]} justify="center" align='center'>
-                    <Avatar src={data[0]?.profile_img} bgColor="blue.700" _hover={{ cursor: "pointer" }} onClick={onOpen} />
+                    <Avatar src={data[0]?.profile_img} bgColor="blue.700" _hover={{ cursor: "pointer" }} onClick={onOpen} border="1px solid" borderColor="gray.900" />
                     <VStack>
                         <Editable defaultValue={data[0]?.first_name} w="full" onSubmit={handleFirstName} >
                             <EditablePreview />
-                            <EditableInput />
+                            <EditableInput rounded="none" w="full" />
                         </Editable>
                         <Editable defaultValue={data[0]?.last_name} w="full" onSubmit={handleLastName} >
                             <EditablePreview />
-                            <EditableInput />
+                            <EditableInput rounded="none" w="full" />
                         </Editable>
                         <Editable defaultValue={data[0]?.username} w="full" onSubmit={username} >
                             <EditablePreview />
-                            <EditableInput />
+                            <EditableInput rounded="none" w="full" />
                         </Editable>
-
                     </VStack>
                 </HStack>
                 <HStack>
-                    <Button rounded="none" variant="outline" onClick={handleSignOut}>Log out</Button>
+                    {/* <Button rounded="none" variant="outline" onClick={handleSignOut}>Log out</Button> */}
                     <Button rounded="none" variant="outline" onClick={() => router.push("/chat")}>Chat</Button>
                 </HStack>
                 <ProfileImagePicker isOpen={isOpen} onClose={onClose} data={data} />

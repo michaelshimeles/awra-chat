@@ -25,7 +25,7 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
         const { data: friendData, error } = await supabase
             .from('friends')
             .select()
-            .eq('followee_id', data[0]?.user_id)
+            .eq('follower_id', data[0]?.user_id)
 
         let friendsArr: Array<object> = []
 
@@ -34,7 +34,7 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                 const { data: friendsList, error } = await supabase
                     .from('profile')
                     .select()
-                    .eq('user_id', id?.follower_id)
+                    .eq('user_id', id?.followee_id)
 
                 if (error) {
                     console.log(error)
@@ -101,7 +101,7 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
     }
 
     return (
-        <Layout>
+        <VStack>
             <HStack w="100%" gap="3rem" border="1px solid" rounded="none" borderColor="gray.900" p="1rem" align="flex-start">
                 <VStack>
                     <Heading fontSize="sm">Friends List</Heading>
@@ -133,7 +133,9 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                         {searchResult?.map((result: { username: string, user_id: UUID }) => {
                             return (
                                 <HStack justify="space-between" w="full">
-                                    <Text key={result?.user_id}>{result?.username}</Text>
+                                    <Text key={result?.user_id} _hover={{
+                                        cursor: "pointer", textDecoration: "underline"
+                                    }}>{result?.username}</Text>
                                     <AddIcon onClick={() => handleFriendRequest(result?.user_id, result?.username)} />
                                 </HStack>
                             )
@@ -141,7 +143,8 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                     </VStack>
                 </VStack>
             </HStack>
-        </Layout>
+        </VStack>
+
     );
 }
 

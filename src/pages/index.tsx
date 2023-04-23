@@ -2,7 +2,7 @@ import Layout from "@/components/Layout/Layout";
 import Login from "@/components/Login/Login";
 import SignUp from "@/components/SignUp/SignUp";
 import {
-  Code,
+  Button,
   Heading,
   Tab,
   TabList,
@@ -10,15 +10,23 @@ import {
   TabPanels,
   Tabs,
   Text,
-  VStack,
+  VStack
 } from "@chakra-ui/react";
-import Head from "next/head";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { useUser } from "@supabase/auth-helpers-react";
+import Head from "next/head";
+import { useRouter } from 'next/router';
 
 interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({ }) => {
+
+  const router = useRouter()
+  // user session
+  const user = useUser();
+
+
   return (
     <Layout>
       <Head>
@@ -36,7 +44,7 @@ const Home: React.FC<HomeProps> = ({ }) => {
           </Text>
         </VStack>
         <VStack>
-          <Tabs variant="line" colorScheme="blue" size="md">
+          {!user ? <Tabs variant="line" colorScheme="blue" size="md">
             <TabList>
               <Tab>Sign Up</Tab>
               <Tab>Login</Tab>
@@ -49,7 +57,11 @@ const Home: React.FC<HomeProps> = ({ }) => {
                 <Login />
               </TabPanel>
             </TabPanels>
-          </Tabs>
+          </Tabs> :
+            <Button onClick={() => router.push("/profile")} variant="outline" rounded="none" w="full">
+              Profile
+            </Button>
+          }
         </VStack>
       </VStack>
     </Layout>
