@@ -1,6 +1,7 @@
 import { Button, HStack, VStack } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import ShakingButton from '../Button/ShakingButton/ShakingButton';
 
 interface NavBarProps {
 
@@ -30,11 +31,14 @@ const NavBar: React.FC<NavBarProps> = ({ }) => {
 
     return (
         <HStack w="100%" p="1rem" justify="flex-end">
-            {user && <Button onClick={() => router.push("/profile")} variant="outline" rounded="none">
+            {user && <ShakingButton onClick={() => router.push("/profile")} >
                 Profile
-            </Button>}
-            {user && <Button rounded="none" variant="outline" onClick={handleSignOut}>Logout</Button>}
-        </HStack>
+            </ShakingButton>}
+            {
+                user && <ShakingButton onClick={handleSignOut}
+                >Logout</ShakingButton>
+            }
+        </HStack >
     );
 }
 

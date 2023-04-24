@@ -1,3 +1,4 @@
+import ShakingButton from '@/components/Button/ShakingButton/ShakingButton';
 import Friends from '@/components/Friends/Friends';
 import Layout from '@/components/Layout/Layout';
 import Protected from '@/components/Protected/Protected';
@@ -5,6 +6,7 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import { Avatar, Box, Button, Editable, EditableInput, EditablePreview, HStack, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, VStack, useDisclosure, useToast } from '@chakra-ui/react';
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
@@ -212,7 +214,8 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
                             onClose()
                             handleRefresh()
                         }
-                        }>
+                        }
+                        >
                             Close
                         </Button>
                         {selected ? <Button isLoading={profileLoading} variant="outline" rounded="none" onClick={() => {
@@ -360,7 +363,7 @@ const profile: React.FC<profileProps> = ({ user, data }) => {
                 </HStack>
                 <HStack>
                     {/* <Button rounded="none" variant="outline" onClick={handleSignOut}>Log out</Button> */}
-                    <Button rounded="none" variant="outline" onClick={() => router.push("/chat")}>Chat</Button>
+                    <ShakingButton onClick={() => router.push("/chat")}>Chat</ShakingButton>
                 </HStack>
                 <ProfileImagePicker isOpen={isOpen} onClose={onClose} data={data} />
                 <Friends data={data} />
