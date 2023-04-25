@@ -6,7 +6,6 @@ import { DeleteIcon } from '@chakra-ui/icons';
 import { Avatar, Box, Button, Editable, EditableInput, EditablePreview, HStack, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, VStack, useDisclosure, useToast } from '@chakra-ui/react';
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";

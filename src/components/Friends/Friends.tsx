@@ -1,4 +1,4 @@
-import { AddIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons';
+import { AddIcon, CheckIcon, CloseIcon, ChatIcon } from '@chakra-ui/icons';
 import { Avatar, HStack, Heading, Input, InputGroup, InputRightElement, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UUID } from 'crypto';
@@ -15,12 +15,13 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
     const [friendsInfo, setFriendsInfo] = useState<any>([])
     const [friendFriendsInfo, setFriendFriendsInfo] = useState<any>([])
     const [loadingFriend, setLoadingFriend] = useState<boolean | null>(null)
-    const [loadingFriendFriends, setLoadingFriendFriends] = useState<boolean | null>(null)
+    // const [loadingFriendFriends, setLoadingFriendFriends] = useState<boolean | null>(null)
     const [friendRequests, setFriendRequests] = useState<any>([])
     const [loadingFriendRequest, setLoadingFriendRequest] = useState<boolean | null>(null)
     const [searchResult, setSearchResult] = useState<any>([])
     const [value, setValue] = useState<any>("")
     const refreshRouter = useRouter()
+    const router = useRouter()
     const toast = useToast();
 
 
@@ -36,6 +37,7 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
             }
         )
         .subscribe()
+
 
     useEffect(() => {
         getFriends()
@@ -144,7 +146,6 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
     }
 
     const getFriendFriends = async (friendId: any) => {
-        setLoadingFriendFriends(true)
         const { data: friendData, error } = await supabase
             .from('friends')
             .select("friends")
@@ -181,7 +182,6 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                 return 0
             })
 
-            setLoadingFriendFriends(false)
             return setFriendFriendsInfo(sortedFriends)
         }
 
@@ -307,7 +307,13 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
         if (friendRequestData) {
             console.log(friendRequestData)
             handleClearSearch()
-
+            toast({
+                title: 'Friend Request sent.',
+                // description: "We've created your account for you.",
+                status: 'success',
+                duration: 9000,
+                isClosable: true,
+            })
             return friendRequestData
         }
 
@@ -317,6 +323,11 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
         }
     }
 
+    const handleMessageFriend = async (friendId: UUID) => {
+        console.log("Clicked")
+        router.push("/chat?f=" + `${data?.[0]?.user_id}`)
+    }
+
     return (
         <VStack>
             <HStack w="100%" gap="3rem" border="1px solid" rounded="none" borderColor="gray.900" p="1rem" align="flex-start">
@@ -324,9 +335,12 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                     <Heading fontSize="sm">Friends List</Heading>
                     <VStack align="flex-start">
                         {!loadingFriend ? friendsInfo?.map((friend: any, index: any) => {
-                            return (<HStack key={index}>
+                            return (<HStack key={index} onClick={() => handleMessageFriend(friend?.user_id)} _hover={{
+                                cursor: "pointer"
+                            }}>
                                 <Avatar src={friend?.profile_img} size="sm" />
                                 <Text>{friend?.username}</Text>
+                                <ChatIcon />
                             </HStack>)
                         }) : <Spinner />}
                     </VStack>
@@ -366,6 +380,7 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                                     <Text _hover={{
                                         cursor: "pointer", textDecoration: "underline"
                                     }}>{result?.username}</Text>
+                                    // Add icon only shows on users that are not friends
                                     {!friendsInfo[index]?.user_id && <AddIcon onClick={() => handleSendingFriendRequest(result?.user_id)} />}
                                 </HStack>
                             )
