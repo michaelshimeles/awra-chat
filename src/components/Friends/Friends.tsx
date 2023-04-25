@@ -1,5 +1,5 @@
 import { AddIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons';
-import { Avatar, HStack, Heading, Input, InputGroup, InputRightElement, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Avatar, HStack, Heading, Input, InputGroup, InputRightElement, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UUID } from 'crypto';
 import { useRouter } from 'next/router';
@@ -13,12 +13,29 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
 
     const supabase = useSupabaseClient()
     const [friendsInfo, setFriendsInfo] = useState<any>([])
+    const [friendFriendsInfo, setFriendFriendsInfo] = useState<any>([])
     const [loadingFriend, setLoadingFriend] = useState<boolean | null>(null)
+    const [loadingFriendFriends, setLoadingFriendFriends] = useState<boolean | null>(null)
     const [friendRequests, setFriendRequests] = useState<any>([])
     const [loadingFriendRequest, setLoadingFriendRequest] = useState<boolean | null>(null)
     const [searchResult, setSearchResult] = useState<any>([])
     const [value, setValue] = useState<any>("")
     const refreshRouter = useRouter()
+    const toast = useToast();
+
+
+    // Real time changes
+    supabase.channel('custom-all-channel')
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'friends' },
+            (payload) => {
+                console.log('Change received!', payload)
+                getFriends()
+                getFriendRequests()
+            }
+        )
+        .subscribe()
 
     useEffect(() => {
         getFriends()
@@ -126,6 +143,55 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
         }
     }
 
+    const getFriendFriends = async (friendId: any) => {
+        setLoadingFriendFriends(true)
+        const { data: friendData, error } = await supabase
+            .from('friends')
+            .select("friends")
+            .eq('user_id', friendId)
+
+        let friendsArr: Array<object> = []
+
+        const friendsId = friendData?.[0]?.friends
+
+        if (friendData) {
+            await Promise.all(friendsId?.map(async (id: string) => {
+
+                const { data: friendsList, error } = await supabase
+                    .from('profile')
+                    .select()
+                    .eq('user_id', id)
+
+                if (error) {
+                    console.log(error)
+                    return error
+                }
+
+
+                if (friendsList) {
+                    friendsArr?.push(friendsList[0])
+                }
+            }))
+
+            const sortedFriends = friendsArr.sort((a: any, b: any) => {
+                const usernameA = a?.username.toLowerCase()
+                const usernameB = b?.username.toLowerCase()
+                if (usernameA < usernameB) return -1
+                if (usernameA > usernameB) return 1
+                return 0
+            })
+
+            setLoadingFriendFriends(false)
+            return setFriendFriendsInfo(sortedFriends)
+        }
+
+
+        if (error) {
+            console.log(error)
+            return
+        }
+    }
+
     const handleSearch = async (e: any) => {
         let searchTerm = e.target.value
         setValue(e.target.value)
@@ -143,6 +209,12 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
 
         if (searchData) {
             // Do something with the retrieved data
+            // searchData.map((result) => {
+            //     return result
+            // })
+            console.log("friendsInfo", friendsInfo)
+            console.log("friendRequests", friendRequests)
+            console.log("searchData", searchData)
             setSearchResult(searchData)
         }
 
@@ -153,17 +225,21 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
         setSearchResult(null)
     }
 
-    const handleFriendRequest = (userId: UUID, username: string) => {
-        handleClearSearch()
-    }
-
     const handleAcceptFriendRequest = async (friendId: UUID) => {
 
+        // All the friends of the current user
         const friends = friendsInfo.map((friend: { user_id: any; }) => {
             return friend.user_id
         })
 
 
+        const friendFriends = friendFriendsInfo.map((friend: { user_id: any; }) => {
+            return friend.user_id
+        })
+
+
+
+        // Adding all the current friends and new friend to current users friends table
         const { data: friendData, error } = await supabase
             .from('friends')
             .update({ friends: [...friends, friendId] })
@@ -171,13 +247,20 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
             .select()
 
 
+        // If new friend is added, update friend request field by removing the accepted friend request
         if (friendData) {
             const friendRequest = friendRequests.filter((friend: { user_id: any; }) => {
                 return friend.user_id !== friendId
             })
 
-            console.log("friendRequest", friendRequest)
+            // Update the friends field and add current user as their friend
+            const { data: friendFriendsData, error: friendFriendsError } = await supabase
+                .from('friends')
+                .update({ friends: [...friendFriends, data?.[0]?.user_id] })
+                .eq('user_id', friendId)    // Correct
+                .select()
 
+            // Update current users friend field
             const { data: friendRequestData, error } = await supabase
                 .from('friends')
                 .update({ friend_requests: [friendRequest] })
@@ -185,14 +268,17 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                 .select()
 
 
-            if (friendRequestData) {
-                console.log("friendRequestData", friendRequestData)
+            if (friendRequestData && friendFriendsData) {
                 handleRefresh()
                 return friendRequestData
             }
             if (error) {
                 console.log("Error", error)
                 return error
+            }
+            if (friendFriendsError) {
+                console.log("friendFriendsError", friendFriendsError)
+                return friendFriendsError
             }
 
         }
@@ -202,6 +288,34 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
         }
     }
 
+    const handleSendingFriendRequest = async (friendId: UUID) => {
+        let friendRequest = friendRequests.map((friend: { user_id: any; }) => {
+            return friend.user_id
+        })
+
+        console.log("friendRequest", friendRequest)
+
+        friendRequest.push(data?.[0]?.user_id)
+        console.log("allFriendRequests", friendRequest)
+
+        const { data: friendRequestData, error } = await supabase
+            .from('friends')
+            .update({ friend_requests: friendRequest })
+            .eq('user_id', friendId)
+            .select()
+
+        if (friendRequestData) {
+            console.log(friendRequestData)
+            handleClearSearch()
+
+            return friendRequestData
+        }
+
+        if (error) {
+            console.log(error)
+            return error
+        }
+    }
 
     return (
         <VStack>
@@ -224,7 +338,10 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                             return (<HStack key={index}>
                                 <Avatar src={friend?.profile_img} size="sm" />
                                 <Text>{friend?.username}</Text>
-                                <CheckIcon onClick={() => handleAcceptFriendRequest(friend?.user_id)} cursor="pointer"
+                                <CheckIcon onClick={() => {
+                                    handleAcceptFriendRequest(friend?.user_id)
+                                    getFriendFriends(friend?.user_id)
+                                }} cursor="pointer"
                                 />
                             </HStack>)
                         }) : <Spinner />}
@@ -243,13 +360,13 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                         </InputGroup>
                     </HStack>
                     <VStack w="100%" align="flex-start">
-                        {searchResult?.map((result: { username: string, user_id: UUID }) => {
+                        {searchResult?.map((result: { username: string, user_id: UUID }, index: number) => {
                             return (
-                                <HStack justify="space-between" w="full">
-                                    <Text key={result?.user_id} _hover={{
+                                <HStack justify="space-between" w="full" key={result?.user_id}>
+                                    <Text _hover={{
                                         cursor: "pointer", textDecoration: "underline"
                                     }}>{result?.username}</Text>
-                                    <AddIcon onClick={() => handleFriendRequest(result?.user_id, result?.username)} />
+                                    {!friendsInfo[index]?.user_id && <AddIcon onClick={() => handleSendingFriendRequest(result?.user_id)} />}
                                 </HStack>
                             )
                         })}

@@ -364,6 +364,7 @@ const profile: React.FC<profileProps> = ({ user, data }) => {
                 <HStack>
                     {/* <Button rounded="none" variant="outline" onClick={handleSignOut}>Log out</Button> */}
                     <ShakingButton onClick={() => router.push("/chat")}>Chat</ShakingButton>
+                    <ShakingButton onClick={() => console.log("Build")}>Need a Friend</ShakingButton>
                 </HStack>
                 <ProfileImagePicker isOpen={isOpen} onClose={onClose} data={data} />
                 <Friends data={data} />

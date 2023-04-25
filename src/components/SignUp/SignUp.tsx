@@ -44,21 +44,17 @@ const SignUp: React.FC<SignUpProps> = () => {
       password: data?.password,
     });
 
-
+    const uniqueID = uuidv4()
 
     // Updating user table
     const { data: userTableData, error: userTableError } = await supabase
       .from('profile')
-      .insert({ user_id: uuidv4(), first_name: data?.firstName, last_name: data?.lastName, email: data?.email, username: `${data?.firstName}`.toLowerCase() + "_" + `${data?.lastName}`.toLowerCase() + Math.floor(1000 + Math.random() * 9000) })
+      .insert({ user_id: uniqueID, first_name: data?.firstName, last_name: data?.lastName, email: data?.email, username: `${data?.firstName}`.toLowerCase() + "_" + `${data?.lastName}`.toLowerCase() + Math.floor(1000 + Math.random() * 9000) })
 
-    if (userTableData) {
-      console.log("Worked", userTableData)
-    }
 
-    if (userTableError) {
-      console.log("Error", userTableError)
-    }
-
+    const { data: friendTable, error: friendError } = await supabase
+      .from('friends')
+      .insert({ user_id: uniqueID, friends: [], friend_requests: [] })
 
 
     if (signUp) {
