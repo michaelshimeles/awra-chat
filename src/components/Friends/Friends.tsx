@@ -1,9 +1,10 @@
 import { AddIcon, CheckIcon, CloseIcon, ChatIcon } from '@chakra-ui/icons';
 import { Avatar, HStack, Heading, Input, InputGroup, InputRightElement, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { UUID } from 'crypto';
+import { UUID, randomUUID } from 'crypto';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface FriendsProps {
     data: any
@@ -324,8 +325,29 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
     }
 
     const handleMessageFriend = async (friendId: UUID) => {
-        console.log("Clicked")
-        router.push("/chat?f=" + `${data?.[0]?.user_id}`)
+
+        const { data: messages, error } = await supabase
+            .from('messages')
+            .select('room_id')
+
+
+        const { data: createChatRoom, error: createChatRoomError } = await supabase
+            .from('messages')
+            .insert({ room_id: uuidv4(), group_users_id: [data?.[0]?.user_id, friendId] })
+            .select()
+
+        if (createChatRoom) {
+            console.log(createChatRoom)
+            router.push("/chat")
+            return
+        }
+
+        if (createChatRoomError) {
+            console.log(createChatRoomError)
+            return error
+        }
+
+        // router.push("/chat?f=" + `${data?.[0]?.user_id}`)
     }
 
     return (

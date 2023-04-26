@@ -1,7 +1,7 @@
 import ChatHistory from '@/components/Chat/ChatHistory';
 import ChatList from '@/components/Chat/ChatList';
 import Layout from '@/components/Layout/Layout';
-import { HStack, VStack } from '@chakra-ui/react';
+import { Center, HStack, Heading, VStack } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react'
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
@@ -19,7 +19,7 @@ const chat: React.FC<chatProps> = ({ user, data }) => {
     const router = useRouter()
     const { f } = router.query
 
-    console.log("friend", f)
+    // console.log("friend", f)
     useEffect(() => {
         getMessageRooms()
     }, [])
@@ -31,13 +31,12 @@ const chat: React.FC<chatProps> = ({ user, data }) => {
             .select();
 
         if (messages) {
-            // console.log("Messages", messages)
 
             const chats = messages.map((room) => {
                 if (room?.group_users_id.includes(data?.[0]?.user_id)) return room.room_id
             })
 
-            console.log("chats", chats)
+            // console.log("chats", chats)
             setMessageRooms(chats)
             return
         }
@@ -51,11 +50,13 @@ const chat: React.FC<chatProps> = ({ user, data }) => {
             <VStack w="100%">
                 <HStack justify="flex-start" pt="5rem" w="80%">
                     <VStack>
-                        {messageRooms?.map((chats: any, index: number) => {
+                        {messageRooms?.[0] ? messageRooms?.map((chats: any, index: number) => {
                             return (
                                 <ChatList key={index} roomId={chats} />
                             )
-                        })}
+                        }) : <Center>
+                            <Heading>No messages</Heading>
+                        </Center>}
                     </VStack>
                     {/* <ChatHistory /> */}
                 </HStack>

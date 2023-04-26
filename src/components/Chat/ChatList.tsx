@@ -1,4 +1,4 @@
-import { Avatar, HStack, Heading, Text, VStack } from '@chakra-ui/react';
+import { Avatar, Center, HStack, Heading, Text, VStack } from '@chakra-ui/react';
 import React, { useEffect, useState } from 'react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
@@ -41,7 +41,6 @@ const ChatList: React.FC<ChatListProps> = ({ roomId }) => {
     return (
         <VStack border="1px solid" borderColor="gray.900" p="1rem" _hover={{ borderColor: "gray.700" }}>
             <HStack>
-                {/* <Avatar /> */}
                 {chatHistory?.map((chat: any, index: any) => {
                     {
                         return (
@@ -58,7 +57,7 @@ const ChatList: React.FC<ChatListProps> = ({ roomId }) => {
                     }
                 })}
             </HStack>
-        </VStack>
+        </VStack >
     );
 }
 
