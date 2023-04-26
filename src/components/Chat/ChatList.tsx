@@ -4,12 +4,26 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 interface ChatListProps {
     roomId: string
+    clicked: boolean
 }
 
-const ChatList: React.FC<ChatListProps> = ({ roomId }) => {
+const ChatList: React.FC<ChatListProps> = ({ roomId, clicked }) => {
 
     const [chatHistory, setChatHistory] = useState<any>(null)
     const supabase = useSupabaseClient()
+
+    supabase.channel('message-changes')
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'chatmessages' },
+            (payload) => {
+                console.log('Change received!', payload)
+                getChatInfo()
+                getUserInfo()
+                    }
+        )
+        .subscribe()
+
 
     useEffect(() => {
         getChatInfo()
@@ -39,19 +53,19 @@ const ChatList: React.FC<ChatListProps> = ({ roomId }) => {
     }
 
     return (
-        <VStack border="1px solid" borderColor="gray.900" p="1rem" _hover={{ borderColor: "gray.700" }}>
+        <VStack border="1px solid" borderColor={clicked ? "gray.700" : "gray.900"} p="1rem" _hover={{ borderColor: "gray.700" }} w="100%" >
             <HStack>
                 {chatHistory?.map((chat: any, index: any) => {
                     {
                         return (
                             <VStack key={index}>
                                 <HStack w="full" justify="flex-start" gap="1rem">
-                                    {chat?.group_users_id?.map((info: any) => {
-                                        return <Heading fontSize="sm">{info.substr(0, 8)}</Heading>
+                                    {chat?.group_users_id?.map((info: any, index: number) => {
+                                        return <Heading key={index} fontSize="sm">{info.substr(0, 8)}</Heading>
                                     })}
                                     {/* <Text>michaelshimeles</Text> */}
                                 </HStack>
-                                <Text>{`Reminder, the space starts in about 30 mins`.substr(0, 30) + "..."}</Text>
+                                {/* <Text>{`${chatHistory?.[chatHistory?.length - 1]?.message}`.substr(0, 30) + "..."}</Text> */}
                             </VStack>
                         )
                     }
