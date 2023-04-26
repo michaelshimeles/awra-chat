@@ -39,10 +39,10 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
         )
         .subscribe()
 
-
     useEffect(() => {
         getFriends()
         getFriendRequests()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     function handleRefresh() {
@@ -408,8 +408,8 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                             {value && <InputRightElement
                                 // pointerEvents="fill"
                                 cursor="pointer"
-                                children={<CloseIcon color='gray.300' onClick={handleClearSearch} />}
                             />}
+                            <CloseIcon color='gray.300' onClick={handleClearSearch} />
                         </InputGroup>
                     </HStack>
                     <VStack w="100%" align="flex-start">
@@ -419,7 +419,6 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                                     <Text _hover={{
                                         cursor: "pointer", textDecoration: "underline"
                                     }}>{result?.username}</Text>
-                                    // Add icon only shows on users that are not friends
                                     {!friendsInfo[index]?.user_id && <AddIcon onClick={() => handleSendingFriendRequest(result?.user_id)} />}
                                 </HStack>
                             )

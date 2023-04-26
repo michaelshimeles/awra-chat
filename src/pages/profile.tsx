@@ -26,7 +26,9 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
 
     const supabase = useSupabaseClient();
     const [images, setImages] = useState<any>(null)
+
     const [uploadSuccess, setUploadSuccess] = useState<boolean | null>(null)
+
     const [selected, setSelected] = useState<any>(null)
     const [profileLoading, setProfileLoading] = useState<boolean>(false)
     const [imageUploadLoading, setImageUploadLoading] = useState<boolean>(false)
@@ -63,6 +65,7 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
 
     useEffect(() => {
         getUploadedImages()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [uploadSuccess])
 
     const onSubmit = async (formData: any) => {
@@ -231,11 +234,15 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
     );
 }
 
-const profile: React.FC<profileProps> = ({ user, data }) => {
+const Profile: React.FC<profileProps> = ({ user, data }) => {
     const toast = useToast()
     const { isOpen, onOpen, onClose } = useDisclosure()
 
     const refreshRouter = useRouter()
+    // Supabase client
+    const supabase = useSupabaseClient();
+    const router = useRouter();
+
 
     function handleRefresh() {
         refreshRouter.reload()
@@ -244,10 +251,6 @@ const profile: React.FC<profileProps> = ({ user, data }) => {
         return (
             <Protected title="Protected Route" info="This is a protected route" forward='/' />
         );
-    // Supabase client
-    const supabase = useSupabaseClient();
-    const router = useRouter();
-
 
     // Signing out user
     const handleSignOut = async () => {
@@ -372,7 +375,7 @@ const profile: React.FC<profileProps> = ({ user, data }) => {
     );
 }
 
-export default profile;
+export default Profile;
 
 
 export const getServerSideProps = async (ctx: any) => {

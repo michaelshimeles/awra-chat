@@ -20,14 +20,14 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, clicked }) => {
                 console.log('Change received!', payload)
                 getChatInfo()
                 getUserInfo()
-                    }
+            }
         )
         .subscribe()
-
 
     useEffect(() => {
         getChatInfo()
         getUserInfo()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const getChatInfo = async () => {

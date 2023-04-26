@@ -1,23 +1,22 @@
-import ShakingButton from '@/components/Button/ShakingButton/ShakingButton';
 import ChatHistory from '@/components/Chat/ChatHistory';
 import ChatList from '@/components/Chat/ChatList';
 import Layout from '@/components/Layout/Layout';
 import { Box, Button, Center, HStack, Heading, Skeleton, Textarea, VStack } from '@chakra-ui/react';
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 
-interface chatProps {
+interface ChatProps {
     user: any,
     data: any
 }
 
 
-const chat: React.FC<chatProps> = ({ user, data }) => {
+const Chat: React.FC<ChatProps> = ({ data }) => {
 
     const [messageRooms, setMessageRooms] = useState<any>(null)
+    
     const [loadingRooms, setLoadingRooms] = useState<any>(null)
     const [selectedChatRoom, setSelectedChatRoom] = useState<any>(null)
     const [clicked, setClicked] = useState<any>(false)
@@ -37,12 +36,13 @@ const chat: React.FC<chatProps> = ({ user, data }) => {
         .subscribe()
 
 
-    // console.log("friend", f)
     useEffect(() => {
         getMessageRooms()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const getMessageRooms = async () => {
+
         setLoadingRooms(true)
         const { data: messages, error } = await supabase
             .from('messages')
@@ -127,7 +127,7 @@ const chat: React.FC<chatProps> = ({ user, data }) => {
     );
 }
 
-export default chat;
+export default Chat;
 
 export const getServerSideProps = async (ctx: any) => {
     // Create authenticated Supabase Client

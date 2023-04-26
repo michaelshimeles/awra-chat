@@ -12,7 +12,7 @@ interface todoProps {
 const todo: React.FC<todoProps> = ({ user }) => {
   if (!user)
     return (
-      <Protected title="Protected Route" info="This is a protected route" />
+      <Protected title="Protected Route" info="This is a protected route" forward={""} />
     );
   return (
     <Layout>

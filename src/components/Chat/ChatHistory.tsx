@@ -26,6 +26,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
 
     useEffect(() => {
         getMessages()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const getMessages = async () => {
