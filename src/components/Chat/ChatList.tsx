@@ -5,9 +5,10 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 interface ChatListProps {
     roomId: string
     clicked: boolean
+    data: any
 }
 
-const ChatList: React.FC<ChatListProps> = ({ roomId, clicked }) => {
+const ChatList: React.FC<ChatListProps> = ({ roomId, clicked, data }) => {
 
     const [chatHistory, setChatHistory] = useState<any>(null)
     const [chatUserName, setChatUserName] = useState<any>(null)
@@ -53,18 +54,25 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, clicked }) => {
             {chatHistory?.map((chat: any, index: any) => (
                 <VStack key={index}>
                     <HStack w="full" justify="flex-start" gap="1rem">
-                        {chat?.group_users_id?.map((info: any, index: number) => (
-                            <PromiseWrapper key={index} promise={getUserInfo(info)}>
-                                {(res: any) => <Heading fontSize="sm">{res}</Heading>}
-                            </PromiseWrapper>
-                        ))}
+                        {chat?.group_users_id?.map((info: any, index: number) => {
+                            if (info !== data?.[0]?.user_id) {
+                                return <Heading key={index} fontSize="sm">{info}</Heading>;
+                            } else {
+                                return null;
+                            }
+                        })}
                     </HStack>
+
                     {/* <Text>{${chatHistory?.[chatHistory?.length - 1]?.message}.substr(0, 30) + "..."}</Text> */}
                 </VStack>
             ))}
         </VStack>
     );
 }
+
+// <PromiseWrapper key={index} promise={getUserInfo(info)}>
+//     {(res: any) => <Heading fontSize="sm">{res}</Heading>}
+// </PromiseWrapper>
 
 // PromiseWrapper component
 interface PromiseWrapperProps {

@@ -100,7 +100,7 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
                             if (chats === undefined) return
                             return (
                                 <Box key={index} onClick={() => handleChatSelection(chats)}>
-                                    <ChatList roomId={chats} clicked={clicked} />
+                                    <ChatList roomId={chats} clicked={clicked} data={data}/>
                                 </Box>
                             )
                         }) : <Center>
