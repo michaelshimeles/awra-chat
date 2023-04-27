@@ -34,6 +34,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
             .subscribe()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomId])
+    
 
     useEffect(() => {
         if (chatHistoryRef.current) {

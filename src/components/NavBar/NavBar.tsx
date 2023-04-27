@@ -11,6 +11,7 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({ }) => {
     const [userInfo, setUserInfo] = useState<any>(null)
     const refreshRouter = useRouter()
+    const [latency, setLatency] = useState<any>(null)
     const supabase = useSupabaseClient();
     const router = useRouter()
 
@@ -21,6 +22,7 @@ const NavBar: React.FC<NavBarProps> = ({ }) => {
         getUserInfo()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+    // Supabase client setup
 
     const getUserInfo = async () => {
 
@@ -57,6 +59,7 @@ const NavBar: React.FC<NavBarProps> = ({ }) => {
 
     return (
         <HStack w="100%" p="1rem" justify="flex-end">
+            {/* <Text>Latency: {Math.round(latency * 100) / 100}s</Text> */}
             <Text as="b" fontSize="sm">Username:</Text> <span>{userInfo?.[0]?.username}</span>
             {user && <ShakingButton onClick={() => router.push("/profile")} >
                 Profile
