@@ -1,6 +1,7 @@
-import { VStack, Text, HStack, Avatar, Box } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react'
+import { Avatar, HStack, Text, VStack } from '@chakra-ui/react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import React, { useEffect, useRef, useState } from 'react';
+
 
 interface ChatHistoryProps {
     roomId: any
@@ -14,6 +15,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
 
     const supabase = useSupabaseClient()
 
+    const chatHistoryRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         getMessages()
@@ -32,10 +34,11 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
 
     }, [])
 
-
-
-
-
+    useEffect(() => {
+        if (chatHistoryRef.current) {
+            chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
+        }
+    }, [chatHistory]);
 
     const getMessages = async () => {
         const { data, error } = await supabase
@@ -58,7 +61,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
 
 
     return (
-        <VStack border="1px solid" borderColor="gray.900" p="1rem" w="full" h="41.875rem" bgColor="gray.900">
+        <VStack ref={chatHistoryRef} border="1px solid" borderColor="gray.900" p="1rem" w="full" h="41.875rem" bgColor="gray.900" overflow="auto">
             {chatHistory.length > 0 && chatHistory.map((chat: any) => {
                 return (
                     <VStack w="100%" key={chat?.id}>

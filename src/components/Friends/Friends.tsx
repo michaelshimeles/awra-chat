@@ -1,7 +1,7 @@
-import { AddIcon, CheckIcon, CloseIcon, ChatIcon } from '@chakra-ui/icons';
+import { AddIcon, ChatIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons';
 import { Avatar, HStack, Heading, Input, InputGroup, InputRightElement, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { UUID, randomUUID } from 'crypto';
+import { UUID } from 'crypto';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';

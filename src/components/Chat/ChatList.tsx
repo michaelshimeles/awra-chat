@@ -1,6 +1,6 @@
-import { Avatar, Center, HStack, Heading, Text, VStack } from '@chakra-ui/react';
-import React, { useEffect, useState } from 'react';
+import { HStack, Heading, VStack } from '@chakra-ui/react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import React, { useEffect, useState } from 'react';
 
 interface ChatListProps {
     roomId: string
@@ -11,8 +11,6 @@ interface ChatListProps {
 const ChatList: React.FC<ChatListProps> = ({ roomId, clicked, data }) => {
 
     const [chatHistory, setChatHistory] = useState<any>(null)
-    const [chatUserName, setChatUserName] = useState<any>(null)
-
     const supabase = useSupabaseClient()
 
     useEffect(() => {
