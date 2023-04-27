@@ -1,5 +1,5 @@
 import { AddIcon, ChatIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons';
-import { Avatar, HStack, Heading, Input, InputGroup, InputRightElement, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
+import { Avatar, HStack, Heading, Icon, Input, InputGroup, InputRightElement, Spinner, Text, VStack, useToast } from '@chakra-ui/react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { UUID } from 'crypto';
 import { useRouter } from 'next/router';
@@ -408,8 +408,8 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                             {value && <InputRightElement
                                 // pointerEvents="fill"
                                 cursor="pointer"
+                                children={<CloseIcon color='gray.300' onClick={handleClearSearch} />}
                             />}
-                            <CloseIcon color='gray.300' onClick={handleClearSearch} />
                         </InputGroup>
                     </HStack>
                     <VStack w="100%" align="flex-start">

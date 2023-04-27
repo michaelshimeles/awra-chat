@@ -11,6 +11,7 @@ interface ChatHistoryProps {
 
 const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
 
+    console.log("RoomID", roomId)
     const [chatHistory, setChatHistory] = useState<any>([])
 
     const supabase = useSupabaseClient()
@@ -32,7 +33,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
             )
             .subscribe()
 
-    }, [])
+    }, [roomId])
 
     useEffect(() => {
         if (chatHistoryRef.current) {
@@ -58,6 +59,16 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
         }
     }
 
+    const getUserInfo = async (id: any) => {
+
+        let { data: profile, error } = await supabase
+            .from('profile')
+            .select('*')
+            .eq("user_id", id)
+
+        if (profile) return profile[0]?.username
+    }
+
 
 
     return (
@@ -67,6 +78,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
                     <VStack w="100%" key={chat?.id}>
                         {(chat?.user_id) !== (userId) ?
                             <VStack w="100%" align="flex-start">
+                                <Text fontSize="xx-small">{chat?.user_id}</Text>
                                 <HStack p="0.5rem" border="1px solid" borderColor="gray.900" rounded="xl" bgColor="black">
                                     <Avatar size="sm" />
                                     <HStack>
@@ -77,13 +89,16 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
                             </VStack>
                             :
                             <VStack w="100%" align="flex-end">
-                                <HStack p="0.5rem" border="1px solid" borderColor="gray.900" rounded="xl" bgColor="black">
-                                    <Avatar size="sm" />
-                                    <HStack>
-                                        <Text fontSize="sm">{chat?.message}</Text>
-                                        <Text fontSize="xx-small">{new Date(chat?.created_at).toLocaleTimeString() + " " + new Date(chat?.created_at).toLocaleDateString()}</Text>
+                                <VStack align="flex-start">
+                                    <Text fontSize="xx-small">{chat?.user_id}</Text>
+                                    <HStack p="0.5rem" border="1px solid" borderColor="gray.900" rounded="xl" bgColor="black">
+                                        <Avatar size="sm" />
+                                        <HStack>
+                                            <Text fontSize="sm">{chat?.message}</Text>
+                                            <Text fontSize="xx-small">{new Date(chat?.created_at).toLocaleTimeString() + " " + new Date(chat?.created_at).toLocaleDateString()}</Text>
+                                        </HStack>
                                     </HStack>
-                                </HStack>
+                                </VStack>
                             </VStack>
                         }
                     </VStack>)

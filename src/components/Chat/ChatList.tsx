@@ -8,9 +8,10 @@ interface ChatListProps {
     data: any
 }
 
-const ChatList: React.FC<ChatListProps> = ({ roomId, clicked, data }) => {
+const ChatList: React.FC<ChatListProps> = ({ roomId, data }) => {
 
     const [chatHistory, setChatHistory] = useState<any>(null)
+    const [clicked, setClicked] = useState<any>({})
     const supabase = useSupabaseClient()
 
     useEffect(() => {
@@ -22,7 +23,7 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, clicked, data }) => {
 
         const { data: chatInfo, error } = await supabase
             .from('messages')
-            .select("group_users_id")
+            .select("*")
             .eq('room_id', roomId)
 
         if (chatInfo) {
@@ -48,28 +49,28 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, clicked, data }) => {
 
 
     return (
-        <VStack border="1px solid" borderColor={clicked ? "gray.700" : "gray.900"} p="1rem" _hover={{ borderColor: "gray.700" }} w="100%" >
+        <VStack>
             {chatHistory?.map((chat: any, index: any) => (
-                <VStack key={index}>
+                <VStack key={index} border="1px solid" borderColor="gray.900" p="1rem" w="10rem" _hover={{ cursor: "pointer" }}>
                     <HStack w="full" justify="flex-start" gap="1rem">
                         {chat?.group_users_id?.map((info: any, index: number) => {
                             if (info !== data?.[0]?.user_id) {
                                 return (
                                     <PromiseWrapper key={index} promise={getUserInfo(info)}>
-                                        {(res: any) => <Heading fontSize="sm">{res}</Heading>}
+                                        {(res: any) => <Heading fontSize="xs">{res}</Heading>}
                                     </PromiseWrapper>
-                                )
+                                );
                             } else {
                                 return null;
                             }
                         })}
                     </HStack>
-
-                    {/* <Text>{${chatHistory?.[chatHistory?.length - 1]?.message}.substr(0, 30) + "..."}</Text> */}
                 </VStack>
             ))}
         </VStack>
     );
+
+
 }
 
 

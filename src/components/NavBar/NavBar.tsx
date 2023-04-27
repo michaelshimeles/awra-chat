@@ -1,19 +1,44 @@
-import { Button, HStack, VStack } from '@chakra-ui/react';
+import { Text, HStack, VStack } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import ShakingButton from '../Button/ShakingButton/ShakingButton';
+import { useEffect, useState } from 'react';
 
 interface NavBarProps {
 
 }
 
 const NavBar: React.FC<NavBarProps> = ({ }) => {
+    const [userInfo, setUserInfo] = useState<any>(null)
     const refreshRouter = useRouter()
     const supabase = useSupabaseClient();
     const router = useRouter()
 
     // user session
     const user = useUser();
+
+    useEffect(() => {
+        getUserInfo()
+    }, [])
+
+    const getUserInfo = async () => {
+
+        let { data: profile, error } = await supabase
+            .from('profile')
+            .select('*')
+            .eq("email", user?.email)
+
+        if (profile) {
+            setUserInfo(profile)
+            return
+        }
+
+        if (error) {
+            console.log(error)
+            return
+        }
+
+    }
 
     function handleRefresh() {
         refreshRouter.reload()
@@ -31,6 +56,7 @@ const NavBar: React.FC<NavBarProps> = ({ }) => {
 
     return (
         <HStack w="100%" p="1rem" justify="flex-end">
+            <Text as="b" fontSize="sm">Username:</Text> <span>{userInfo?.[0]?.username}</span>
             {user && <ShakingButton onClick={() => router.push("/profile")} >
                 Profile
             </ShakingButton>}

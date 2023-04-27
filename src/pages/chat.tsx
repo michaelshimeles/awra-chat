@@ -27,8 +27,8 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
 
     const refreshHistory = () => {
         setHistoryKey(prevKey => prevKey + 1);
-      };
-      
+    };
+
 
     useEffect(() => {
         getMessageRooms()
@@ -60,6 +60,7 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
 
     const handleChatSelection = (chats: any) => {
         setClicked(true)
+        console.log("Chats", chats)
         setSelectedChatRoom(chats)
     }
 
@@ -100,7 +101,7 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
                             if (chats === undefined) return
                             return (
                                 <Box key={index} onClick={() => handleChatSelection(chats)}>
-                                    <ChatList roomId={chats} clicked={clicked} data={data}/>
+                                    <ChatList roomId={chats} clicked={clicked} data={data} />
                                 </Box>
                             )
                         }) : <Center>
@@ -109,21 +110,35 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
                             </Skeleton>
                         </Center>}
                     </VStack>
-                    {selectedChatRoom && <VStack w="80%">
+                    {selectedChatRoom ? <VStack w="80%">
                         <ChatHistory roomId={selectedChatRoom} userId={data?.[0]?.user_id} historyKey={historyKey} />
                         <VStack w="full">
-                            <form onSubmit={handleSubmit(onSubmit)}>
-                                <HStack w="full">
-                                    <Textarea rounded="none" {...register("chatMessage", { required: true })} />
-                                    <Button type="submit" rounded="none"
-                                        variant="outline">Send</Button>
-                                </HStack>
-                            </form>
+                            <Box w="100%">
+                                <form onSubmit={handleSubmit(onSubmit)}>
+                                    <HStack w="full">
+                                        <Textarea rounded="none" {...register("chatMessage", { required: true })} />
+                                        <Button type="submit" rounded="none" variant="outline" h="5rem">Send</Button>
+                                    </HStack>
+                                </form>
+                            </Box>
+                        </VStack>
+                    </VStack> : <VStack w="80%">
+                        <ChatHistory roomId={messageRooms?.[1]} userId={data?.[0]?.user_id} historyKey={historyKey} />
+                        <VStack w="full">
+                            <Box w="100%">
+                                <form onSubmit={handleSubmit(onSubmit)}>
+                                    <HStack w="full">
+                                        <Textarea rounded="none" {...register("chatMessage", { required: true })} />
+                                        <Button type="submit" rounded="none" variant="outline" h="5rem">Send</Button>
+                                    </HStack>
+                                </form>
+                            </Box>
                         </VStack>
                     </VStack>}
                 </HStack>
             </VStack>
         </Layout>
+
     );
 }
 
