@@ -123,7 +123,7 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
                             </Box>
                         </VStack>
                     </VStack> : <VStack w="80%">
-                        <ChatHistory roomId={messageRooms?.[1]} userId={data?.[0]?.user_id} historyKey={historyKey} />
+                        <ChatHistory roomId={messageRooms?.[0]} userId={data?.[0]?.user_id} historyKey={historyKey} />
                         <VStack w="full">
                             <Box w="100%">
                                 <form onSubmit={handleSubmit(onSubmit)}>
