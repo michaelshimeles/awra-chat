@@ -46,8 +46,6 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data }) => {
 
         if (profile) return profile[0]?.username
     }
-
-
     return (
         <VStack>
             {chatHistory?.map((chat: any, index: any) => (

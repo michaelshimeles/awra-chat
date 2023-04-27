@@ -25,8 +25,6 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
     const router = useRouter()
     const toast = useToast();
 
-
-    // Real time changes
     supabase.channel('custom-all-channel')
         .on(
             'postgres_changes',
@@ -408,9 +406,8 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                             {value && <InputRightElement
                                 // pointerEvents="fill"
                                 cursor="pointer"
-                                // eslint-disable-next-line 
-                                children={<CloseIcon color='gray.300' onClick={handleClearSearch} />}
-                            />}
+                            // eslint-disable-next-line 
+                            ><CloseIcon color='gray.300' onClick={handleClearSearch} /></InputRightElement>}
                         </InputGroup>
                     </HStack>
                     <VStack w="100%" align="flex-start">
