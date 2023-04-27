@@ -5,6 +5,7 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 interface ChatHistoryProps {
     roomId: any
     userId: any
+    historyKey: any
 }
 
 const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
@@ -13,21 +14,28 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
 
     const supabase = useSupabaseClient()
 
-    supabase.channel('message-changes')
-        .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'chatmessages' },
-            (payload) => {
-                console.log('Change received!', payload)
-                getMessages()
-            }
-        )
-        .subscribe()
 
     useEffect(() => {
         getMessages()
         // eslint-disable-next-line react-hooks/exhaustive-deps
+        const chatmessages = supabase.channel('custom-all-channel')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'chatmessages' },
+                (payload) => {
+                    console.log('Change received!', payload)
+                    console.log("Event type", payload.eventType)
+                    getMessages()
+                }
+            )
+            .subscribe()
+
     }, [])
+
+
+
+
+
 
     const getMessages = async () => {
         const { data, error } = await supabase
@@ -36,10 +44,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
             .eq('room_id', roomId)
             .order('created_at', { ascending: true })
 
-        console.log('chats:', data) // Debugging statement
-
         if (data) {
-            console.log(data)
             setChatHistory(data)
             return data
         }
@@ -51,14 +56,15 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
     }
 
 
+
     return (
-        <VStack border="1px solid" borderColor="gray.900" p="1rem" w="full" h="41.875rem">
+        <VStack border="1px solid" borderColor="gray.900" p="1rem" w="full" h="41.875rem" bgColor="gray.900">
             {chatHistory.length > 0 && chatHistory.map((chat: any) => {
                 return (
                     <VStack w="100%" key={chat?.id}>
                         {(chat?.user_id) !== (userId) ?
                             <VStack w="100%" align="flex-start">
-                                <HStack p="0.5rem" border="1px solid" borderColor="gray.900" rounded="xl">
+                                <HStack p="0.5rem" border="1px solid" borderColor="gray.900" rounded="xl" bgColor="black">
                                     <Avatar size="sm" />
                                     <HStack>
                                         <Text fontSize="sm">{chat?.message}</Text>
@@ -68,7 +74,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
                             </VStack>
                             :
                             <VStack w="100%" align="flex-end">
-                                <HStack p="0.5rem" border="1px solid" borderColor="gray.900" rounded="xl">
+                                <HStack p="0.5rem" border="1px solid" borderColor="gray.900" rounded="xl" bgColor="black">
                                     <Avatar size="sm" />
                                     <HStack>
                                         <Text fontSize="sm">{chat?.message}</Text>

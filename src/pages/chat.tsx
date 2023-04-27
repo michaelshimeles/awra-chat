@@ -16,25 +16,19 @@ interface ChatProps {
 const Chat: React.FC<ChatProps> = ({ data }) => {
 
     const [messageRooms, setMessageRooms] = useState<any>(null)
-    
     const [loadingRooms, setLoadingRooms] = useState<any>(null)
     const [selectedChatRoom, setSelectedChatRoom] = useState<any>(null)
     const [clicked, setClicked] = useState<any>(false)
+    const [historyKey, setHistoryKey] = useState(0);
+
     const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
 
     const supabase = useSupabaseClient()
 
-    supabase.channel('message-changes')
-        .on(
-            'postgres_changes',
-            { event: '*', schema: 'public', table: 'chatmessages' },
-            (payload) => {
-                console.log('Change received!', payload)
-                getMessageRooms()
-            }
-        )
-        .subscribe()
-
+    const refreshHistory = () => {
+        setHistoryKey(prevKey => prevKey + 1);
+      };
+      
 
     useEffect(() => {
         getMessageRooms()
@@ -69,26 +63,31 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
         setSelectedChatRoom(chats)
     }
 
-    const onSubmit = async (formData: any) => {
-        console.log("selectedChatRoom", selectedChatRoom)
+    const onSubmit = (formData: any) => {
+        submitMessage(selectedChatRoom, data?.[0]?.user_id, formData?.chatMessage).then((result) => {
+            console.log("result", result)
+            reset()
+            refreshHistory();
+        })
+    }
 
+    const submitMessage = async (chatRoom: any, userId: any, message: any) => {
         const { data: sendingMessageData, error } = await supabase
             .from('chatmessages')
             .insert({
-                room_id: selectedChatRoom,
-                user_id: data?.[0]?.user_id,
-                message: formData?.chatMessage
+                room_id: chatRoom,
+                user_id: userId,
+                message: message
             });
-
-        if (data) {
-            console.log(sendingMessageData)
-            reset();
-            return
-        }
 
         if (error) {
             console.log(error)
             return error
+        }
+
+        if (sendingMessageData) {
+            console.log("sendingMessageData", data)
+            return
         }
     }
 
@@ -98,6 +97,7 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
                 <HStack align="flex-start" justify="flex-start" pt="5rem" w="80%">
                     <VStack w="20%">
                         {!loadingRooms ? messageRooms?.map((chats: any, index: number) => {
+                            if (chats === undefined) return
                             return (
                                 <Box key={index} onClick={() => handleChatSelection(chats)}>
                                     <ChatList roomId={chats} clicked={clicked} />
@@ -110,7 +110,7 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
                         </Center>}
                     </VStack>
                     {selectedChatRoom && <VStack w="80%">
-                        <ChatHistory roomId={selectedChatRoom} userId={data?.[0]?.user_id} />
+                        <ChatHistory roomId={selectedChatRoom} userId={data?.[0]?.user_id} historyKey={historyKey} />
                         <VStack w="full">
                             <form onSubmit={handleSubmit(onSubmit)}>
                                 <HStack w="full">
