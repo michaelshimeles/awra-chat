@@ -408,6 +408,7 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                             {value && <InputRightElement
                                 // pointerEvents="fill"
                                 cursor="pointer"
+                                // eslint-disable-next-line 
                                 children={<CloseIcon color='gray.300' onClick={handleClearSearch} />}
                             />}
                         </InputGroup>

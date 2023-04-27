@@ -19,8 +19,8 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
     const chatHistoryRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        getMessages()
         // eslint-disable-next-line react-hooks/exhaustive-deps
+        getMessages()
         const chatmessages = supabase.channel('custom-all-channel')
             .on(
                 'postgres_changes',
@@ -32,13 +32,14 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
                 }
             )
             .subscribe()
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomId])
 
     useEffect(() => {
         if (chatHistoryRef.current) {
             chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chatHistory]);
 
     const getMessages = async () => {
@@ -59,15 +60,15 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
         }
     }
 
-    const getUserInfo = async (id: any) => {
+    // const getUserInfo = async (id: any) => {
 
-        let { data: profile, error } = await supabase
-            .from('profile')
-            .select('*')
-            .eq("user_id", id)
+    //     let { data: profile, error } = await supabase
+    //         .from('profile')
+    //         .select('*')
+    //         .eq("user_id", id)
 
-        if (profile) return profile[0]?.username
-    }
+    //     if (profile) return profile[0]?.username
+    // }
 
 
 
