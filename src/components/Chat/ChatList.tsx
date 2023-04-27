@@ -56,7 +56,11 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, clicked, data }) => {
                     <HStack w="full" justify="flex-start" gap="1rem">
                         {chat?.group_users_id?.map((info: any, index: number) => {
                             if (info !== data?.[0]?.user_id) {
-                                return <Heading key={index} fontSize="sm">{info}</Heading>;
+                                return (
+                                    <PromiseWrapper key={index} promise={getUserInfo(info)}>
+                                        {(res: any) => <Heading fontSize="sm">{res}</Heading>}
+                                    </PromiseWrapper>
+                                )
                             } else {
                                 return null;
                             }
@@ -70,9 +74,7 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, clicked, data }) => {
     );
 }
 
-// <PromiseWrapper key={index} promise={getUserInfo(info)}>
-//     {(res: any) => <Heading fontSize="sm">{res}</Heading>}
-// </PromiseWrapper>
+
 
 // PromiseWrapper component
 interface PromiseWrapperProps {
