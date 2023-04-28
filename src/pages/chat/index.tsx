@@ -72,18 +72,19 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
             <VStack w="100%">
                 <HStack align="flex-start" justify="flex-start" pt="5rem" w="80%">
                     <VStack w="20%">
-                        {!loadingRooms ? messageRooms?.map((chats: any, index: number) => {
+                        {messageRooms?.map((chats: any, index: number) => {
                             if (chats === undefined) return
                             return (
                                 <Box key={index} onClick={() => handleChatSelection(chats)}>
-                                    <ChatList roomId={chats}  data={data} />
+                                    <ChatList roomId={chats} data={data} />
                                 </Box>
                             )
-                        }) : <Center>
-                            <Skeleton>
-                                <Heading>No messages</Heading>
-                            </Skeleton>
-                        </Center>}
+                        })}
+                    </VStack>
+                    <VStack w="80%">
+                        <Center>
+                            <Heading>No chat messages</Heading>
+                        </Center>
                     </VStack>
                 </HStack>
             </VStack>

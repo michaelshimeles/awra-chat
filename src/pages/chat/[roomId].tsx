@@ -59,7 +59,7 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
     }
 
     const handleChatSelection = (chats: any) => {
-        setSelectedChatRoom(chats)
+        // setSelectedChatRoom(chats)
         router.replace("/chat/" + chats)
     }
 
@@ -117,7 +117,7 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
                         </Center>}
                     </VStack>
                     {roomId && <VStack w="80%">
-                        <ChatHistory roomId={selectedChatRoom} userId={data?.[0]?.user_id} historyKey={historyKey} />
+                        <ChatHistory roomId={roomId} userId={data?.[0]?.user_id} historyKey={historyKey} />
                         <VStack w="full">
                             <Box w="100%">
                                 <form onSubmit={handleSubmit(onSubmit)}>

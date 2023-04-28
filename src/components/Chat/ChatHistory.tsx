@@ -61,21 +61,10 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
         }
     }
 
-    // const getUserInfo = async (id: any) => {
-
-    //     let { data: profile, error } = await supabase
-    //         .from('profile')
-    //         .select('*')
-    //         .eq("user_id", id)
-
-    //     if (profile) return profile[0]?.username
-    // }
-
-
-
     return (
         <VStack ref={chatHistoryRef} border="1px solid" borderColor="gray.900" p="1rem" w="full" h="41.875rem" bgColor="gray.900" overflow="auto">
             {chatHistory.length > 0 && chatHistory.map((chat: any) => {
+                console.log("chat", chat)
                 return (
                     <VStack w="100%" key={chat?.id}>
                         {(chat?.user_id) !== (userId) ?
