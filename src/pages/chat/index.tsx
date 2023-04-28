@@ -1,4 +1,4 @@
-import { Box, Center, HStack, Heading, Skeleton, VStack } from '@chakra-ui/react';
+import { Box, Center, HStack, Heading, Show, Skeleton, VStack } from '@chakra-ui/react';
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import dynamic from 'next/dynamic';
@@ -63,24 +63,37 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
     }
 
     const handleChatSelection = (chats: any) => {
-        console.log("Clicked", chats)
-        router.replace(`/chat/${chats}`)
+        router.push(`/chat/${chats}`)
     }
 
     return (
         <Layout>
             <VStack w="100%">
                 <HStack align="flex-start" justify="flex-start" pt="5rem" w="80%">
-                    <VStack w="20%">
-                        {messageRooms?.map((chats: any, index: number) => {
-                            if (chats === undefined) return
-                            return (
-                                <Box key={index} onClick={() => handleChatSelection(chats)}>
-                                    <ChatList roomId={chats} data={data} />
-                                </Box>
-                            )
-                        })}
-                    </VStack>
+                    <Show above='md'>
+                        <VStack w="20%">
+                            {messageRooms?.map((chats: any, index: number) => {
+                                if (chats === undefined) return
+                                return (
+                                    <Box key={index} onClick={() => handleChatSelection(chats)}>
+                                        <ChatList roomId={chats} data={data} />
+                                    </Box>
+                                )
+                            })}
+                        </VStack>
+                    </Show>
+                    <Show below='md'>
+                        <VStack w="10%">
+                            {messageRooms?.map((chats: any, index: number) => {
+                                if (chats === undefined) return
+                                return (
+                                    <Box key={index} onClick={() => handleChatSelection(chats)}>
+                                        <ChatList roomId={chats} data={data} />
+                                    </Box>
+                                )
+                            })}
+                        </VStack>
+                    </Show>
                     <VStack w="80%">
                         <Center>
                             <Heading>No chat messages</Heading>

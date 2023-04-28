@@ -20,7 +20,7 @@ interface ChatProps {
 const Chat: React.FC<ChatProps> = ({ data }) => {
     const [messageRooms, setMessageRooms] = useState<any>(null)
     const [loadingRooms, setLoadingRooms] = useState<any>(null)
-    const [selectedChatRoom, setSelectedChatRoom] = useState<any>(null)
+    // const [selectedChatRoom, setSelectedChatRoom] = useState<any>(null)
     const [historyKey, setHistoryKey] = useState(0);
 
     const router = useRouter()
@@ -35,7 +35,7 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
 
     useEffect(() => {
         getMessageRooms()
-        setSelectedChatRoom(roomId)
+        // setSelectedChatRoom(roomId)
     }, [roomId]); // use roomId as a dependency of useEffect instead of calling setSelectedChatRoom conditionally
 
     const getMessageRooms = async () => {
@@ -103,18 +103,14 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
             <VStack w="100%">
                 <HStack align="flex-start" justify="flex-start" pt="5rem" w="80%">
                     <VStack w="20%">
-                        {!loadingRooms ? messageRooms?.map((chats: any, index: number) => {
+                        {messageRooms?.map((chats: any, index: number) => {
                             if (chats === undefined) return
                             return (
                                 <Box key={index} onClick={() => handleChatSelection(chats)}>
                                     <ChatList roomId={chats} data={data} />
                                 </Box>
                             )
-                        }) : <Center>
-                            <Skeleton>
-                                <Heading>No messages</Heading>
-                            </Skeleton>
-                        </Center>}
+                        })}
                     </VStack>
                     {roomId && <VStack w="80%">
                         <ChatHistory roomId={roomId} userId={data?.[0]?.user_id} historyKey={historyKey} />
