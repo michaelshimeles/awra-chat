@@ -16,7 +16,6 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
     const [friendsInfo, setFriendsInfo] = useState<any>([])
     const [friendFriendsInfo, setFriendFriendsInfo] = useState<any>([])
     const [loadingFriend, setLoadingFriend] = useState<boolean | null>(null)
-    // const [loadingFriendFriends, setLoadingFriendFriends] = useState<boolean | null>(null)
     const [friendRequests, setFriendRequests] = useState<any>([])
     const [loadingFriendRequest, setLoadingFriendRequest] = useState<boolean | null>(null)
     const [searchResult, setSearchResult] = useState<any>([])

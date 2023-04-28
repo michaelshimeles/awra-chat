@@ -4,6 +4,17 @@ import { SessionContextProvider, Session } from "@supabase/auth-helpers-react";
 import { useState } from "react";
 import type { AppProps } from "next/app";
 import theme from "../../theme";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
+// Create a client
+const queryClient = new QueryClient()
 
 export default function MyApp({
   Component,
@@ -13,14 +24,17 @@ export default function MyApp({
 }>) {
   const [supabaseClient] = useState(() => createBrowserSupabaseClient());
   return (
-    <SessionContextProvider
-      supabaseClient={supabaseClient}
-      initialSession={pageProps.initialSession}
-    >
-      <ChakraProvider theme={theme}>
-        <ColorModeScript initialColorMode="dark" />
-        <Component {...pageProps} />
-      </ChakraProvider>
-    </SessionContextProvider>
+    <QueryClientProvider client={queryClient}>
+      <SessionContextProvider
+        supabaseClient={supabaseClient}
+        initialSession={pageProps.initialSession}
+      >
+        <ChakraProvider theme={theme}>
+          <ColorModeScript initialColorMode="dark" />
+          <Component {...pageProps} />
+        </ChakraProvider>
+      </SessionContextProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 }

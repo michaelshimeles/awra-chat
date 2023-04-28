@@ -15,7 +15,6 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({ }) => {
     const [userInfo, setUserInfo] = useState<any>(null)
     const refreshRouter = useRouter()
-    const [latency, setLatency] = useState<any>(null)
     const supabase = useSupabaseClient();
     const router = useRouter()
 

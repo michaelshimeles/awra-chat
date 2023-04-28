@@ -79,8 +79,6 @@ export const getServerSideProps = async (ctx: any) => {
     data: { session },
   } = await supabase.auth.getSession();
 
-  console.log("data", session);
-
   if (!session)
     return {
       props: {

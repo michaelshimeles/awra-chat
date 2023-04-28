@@ -3,17 +3,15 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useRef, useState } from 'react';
 
 
+
 interface ChatHistoryProps {
     roomId: any
     userId: any
-    historyKey: any
 }
 
 const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
 
-    console.log("RoomID", roomId)
     const [chatHistory, setChatHistory] = useState<any>([])
-
     const supabase = useSupabaseClient()
 
     const chatHistoryRef = useRef<HTMLDivElement>(null);
@@ -21,6 +19,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         getMessages()
+
         const chatmessages = supabase.channel('custom-all-channel')
             .on(
                 'postgres_changes',
@@ -34,7 +33,6 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
             .subscribe()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [roomId])
-    
 
     useEffect(() => {
         if (chatHistoryRef.current) {
@@ -46,7 +44,9 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
     const getMessages = async () => {
         const { data, error } = await supabase
             .from('chatmessages')
-            .select()
+            .select(`
+          *
+        `)
             .eq('room_id', roomId)
             .order('created_at', { ascending: true })
 
@@ -61,10 +61,10 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId }) => {
         }
     }
 
+    console.log("Chat History", chatHistory)
     return (
         <VStack ref={chatHistoryRef} border="1px solid" borderColor="gray.900" p="1rem" w="full" h="41.875rem" bgColor="gray.900" overflow="auto">
-            {chatHistory.length > 0 && chatHistory.map((chat: any) => {
-                console.log("chat", chat)
+            {chatHistory?.length > 0 && chatHistory?.map((chat: any, index: number) => {
                 return (
                     <VStack w="100%" key={chat?.id}>
                         {(chat?.user_id) !== (userId) ?
