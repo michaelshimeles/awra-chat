@@ -20,6 +20,7 @@ interface ChatProps {
 
 export const Chat: React.FC<ChatProps> = ({ data, children }) => {
     const { data: getMessageRooms, isLoading } = useGetMessageRoom(data?.[0]?.user_id);
+    console.log("getMessageRooms", getMessageRooms)
     const [selectedChat, setSelectedChat] = useState<any>(null)
 
     const supabase = useSupabaseClient()
