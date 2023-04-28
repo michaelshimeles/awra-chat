@@ -1,6 +1,3 @@
-import Layout from "@/components/Layout/Layout";
-import Login from "@/components/Login/Login";
-import SignUp from "@/components/SignUp/SignUp";
 import {
   Button,
   Heading,
@@ -16,6 +13,10 @@ import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useUser } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
+const Layout = dynamic(() => import('@/components/Layout/Layout'));
+const Login = dynamic(() => import('@/components/Login/Login'));
+const SignUp = dynamic(() => import('@/components/SignUp/SignUp'));
 
 interface HomeProps {
 }

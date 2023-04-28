@@ -1,8 +1,12 @@
-import { Text, HStack, VStack } from '@chakra-ui/react';
-import { useRouter } from 'next/router';
+import { HStack, Text } from '@chakra-ui/react';
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
-import ShakingButton from '../Button/ShakingButton/ShakingButton';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+
+const ShakingButton = dynamic(
+    () => import('@/components/Button/ShakingButton/ShakingButton')
+);
 
 interface NavBarProps {
 
@@ -21,7 +25,7 @@ const NavBar: React.FC<NavBarProps> = ({ }) => {
     useEffect(() => {
         getUserInfo()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [user])
     // Supabase client setup
 
     const getUserInfo = async () => {
@@ -59,11 +63,13 @@ const NavBar: React.FC<NavBarProps> = ({ }) => {
 
     return (
         <HStack w="100%" p="1rem" justify="flex-end">
-            {/* <Text>Latency: {Math.round(latency * 100) / 100}s</Text> */}
-            <Text as="b" fontSize="sm">Username:</Text> <span>{userInfo?.[0]?.username}</span>
-            {user && <ShakingButton onClick={() => router.push("/profile")} >
-                Profile
-            </ShakingButton>}
+            {user &&
+                <>
+                    <Text as="b" fontSize="sm">Username:</Text> <span>{userInfo?.[0]?.username}</span>
+                    <ShakingButton onClick={() => router.push("/profile")} >
+                        Profile
+                    </ShakingButton>
+                </>}
             {
                 user && <ShakingButton onClick={handleSignOut}
                 >Logout</ShakingButton>

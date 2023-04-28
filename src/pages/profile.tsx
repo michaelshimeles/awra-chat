@@ -1,7 +1,3 @@
-import ShakingButton from '@/components/Button/ShakingButton/ShakingButton';
-import Friends from '@/components/Friends/Friends';
-import Layout from '@/components/Layout/Layout';
-import Protected from '@/components/Protected/Protected';
 import { DeleteIcon } from '@chakra-ui/icons';
 import { Avatar, Box, Button, Editable, EditableInput, EditablePreview, HStack, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, VStack, useDisclosure, useToast } from '@chakra-ui/react';
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
@@ -9,6 +5,14 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
+import dynamic from 'next/dynamic';
+
+const ShakingButton = dynamic(
+    () => import('@/components/Button/ShakingButton/ShakingButton')
+);
+const Friends = dynamic(() => import('@/components/Friends/Friends'));
+const Layout = dynamic(() => import('@/components/Layout/Layout'));
+const Protected = dynamic(() => import('@/components/Protected/Protected'));
 
 
 interface profileProps {
@@ -345,9 +349,9 @@ const Profile: React.FC<profileProps> = ({ user, data }) => {
 
     return (
         <Layout>
-            <VStack pt="15rem" px="2rem">
+            <VStack pt="5rem" px="2rem">
                 <HStack border="1px solid" rounded="sm" p="2rem" gap="1rem" borderColor="gray.900" w={["15rem", "25rem"]} justify="center" align='center'>
-                    <Avatar src={data[0]?.profile_img} bgColor="blue.700" _hover={{ cursor: "pointer" }} onClick={onOpen} border="1px solid" borderColor="gray.900" />
+                    <Avatar src={data[0]?.profile_img} bgColor="blue.700" _hover={{ cursor: "pointer" }} onClick={onOpen} border="1px solid" borderColor="gray.900" size="xl" />
                     <VStack>
                         <Editable defaultValue={data[0]?.first_name} w="full" onSubmit={handleFirstName} >
                             <EditablePreview />

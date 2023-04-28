@@ -1,11 +1,15 @@
-import ChatHistory from '@/components/Chat/ChatHistory';
-import ChatList from '@/components/Chat/ChatList';
-import Layout from '@/components/Layout/Layout';
 import { Box, Button, Center, HStack, Heading, Skeleton, Textarea, VStack } from '@chakra-ui/react';
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
+import { useRouter } from 'next/router';
+import dynamic from 'next/dynamic';
+
+const ChatHistory = dynamic(() => import('@/components/Chat/ChatHistory'))
+const Layout = dynamic(() => import('@/components/Layout/Layout'))
+const ChatList = dynamic(() => import('@/components/Chat/ChatList'))
+const Protected = dynamic(() => import("@/components/Protected/Protected"))
 
 interface ChatProps {
     user: any,
@@ -15,11 +19,20 @@ interface ChatProps {
 
 const Chat: React.FC<ChatProps> = ({ data }) => {
 
+    if (!data)
+        return (
+            <Protected title="Protected Route" info="This is a protected route" forward='/' />
+        );
+
     const [messageRooms, setMessageRooms] = useState<any>(null)
     const [loadingRooms, setLoadingRooms] = useState<any>(null)
     const [selectedChatRoom, setSelectedChatRoom] = useState<any>(null)
-    const [clicked, setClicked] = useState<any>(false)
     const [historyKey, setHistoryKey] = useState(0);
+
+    const router = useRouter()
+
+    const { roomId } = router.query
+
 
     const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
 
@@ -32,6 +45,7 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
 
     useEffect(() => {
         getMessageRooms()
+        setSelectedChatRoom(roomId)
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
@@ -59,24 +73,24 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
     }
 
     const handleChatSelection = (chats: any) => {
-        setClicked(true)
         console.log("Chats", chats)
         setSelectedChatRoom(chats)
+        router.replace("/chat/" + chats)
     }
 
     const onSubmit = (formData: any) => {
-        submitMessage(selectedChatRoom, data?.[0]?.user_id, formData?.chatMessage).then((result) => {
+        submitMessage(data?.[0]?.user_id, formData?.chatMessage).then((result) => {
             console.log("result", result)
             reset()
             refreshHistory();
         })
     }
 
-    const submitMessage = async (chatRoom: any, userId: any, message: any) => {
+    const submitMessage = async (userId: any, message: any) => {
         const { data: sendingMessageData, error } = await supabase
             .from('chatmessages')
             .insert({
-                room_id: chatRoom,
+                room_id: roomId,
                 user_id: userId,
                 message: message
             });
@@ -101,7 +115,7 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
                             if (chats === undefined) return
                             return (
                                 <Box key={index} onClick={() => handleChatSelection(chats)}>
-                                    <ChatList roomId={chats} clicked={clicked} data={data} />
+                                    <ChatList roomId={chats} data={data} />
                                 </Box>
                             )
                         }) : <Center>
@@ -110,20 +124,8 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
                             </Skeleton>
                         </Center>}
                     </VStack>
-                    {selectedChatRoom ? <VStack w="80%">
+                    {roomId && <VStack w="80%">
                         <ChatHistory roomId={selectedChatRoom} userId={data?.[0]?.user_id} historyKey={historyKey} />
-                        <VStack w="full">
-                            <Box w="100%">
-                                <form onSubmit={handleSubmit(onSubmit)}>
-                                    <HStack w="full">
-                                        <Textarea rounded="none" {...register("chatMessage", { required: true })} />
-                                        <Button type="submit" rounded="none" variant="outline" h="5rem">Send</Button>
-                                    </HStack>
-                                </form>
-                            </Box>
-                        </VStack>
-                    </VStack> : <VStack w="80%">
-                        <ChatHistory roomId={messageRooms?.[0]} userId={data?.[0]?.user_id} historyKey={historyKey} />
                         <VStack w="full">
                             <Box w="100%">
                                 <form onSubmit={handleSubmit(onSubmit)}>

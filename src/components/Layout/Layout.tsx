@@ -1,6 +1,7 @@
 import React from "react";
-import NavBar from "@/components/NavBar/NavBar";
 import { Box } from "@chakra-ui/react";
+import dynamic from "next/dynamic";
+const NavBar = dynamic(() => import("@/components/NavBar/NavBar"));
 
 interface LayoutProps {
   children: any;

@@ -4,14 +4,12 @@ import React, { useEffect, useState } from 'react';
 
 interface ChatListProps {
     roomId: string
-    clicked: boolean
     data: any
 }
 
 const ChatList: React.FC<ChatListProps> = ({ roomId, data }) => {
 
     const [chatHistory, setChatHistory] = useState<any>(null)
-    const [clicked, setClicked] = useState<any>({})
     const supabase = useSupabaseClient()
 
     useEffect(() => {
