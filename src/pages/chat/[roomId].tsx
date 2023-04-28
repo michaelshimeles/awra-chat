@@ -18,12 +18,6 @@ interface ChatProps {
 
 
 const Chat: React.FC<ChatProps> = ({ data }) => {
-
-    if (!data)
-        return (
-            <Protected title="Protected Route" info="This is a protected route" forward='/' />
-        );
-
     const [messageRooms, setMessageRooms] = useState<any>(null)
     const [loadingRooms, setLoadingRooms] = useState<any>(null)
     const [selectedChatRoom, setSelectedChatRoom] = useState<any>(null)
@@ -33,24 +27,18 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
 
     const { roomId } = router.query
 
-
-    const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
-
     const supabase = useSupabaseClient()
 
     const refreshHistory = () => {
         setHistoryKey(prevKey => prevKey + 1);
     };
 
-
     useEffect(() => {
         getMessageRooms()
         setSelectedChatRoom(roomId)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [roomId]); // use roomId as a dependency of useEffect instead of calling setSelectedChatRoom conditionally
 
     const getMessageRooms = async () => {
-
         setLoadingRooms(true)
         const { data: messages, error } = await supabase
             .from('messages')
@@ -60,8 +48,6 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
             const chats = messages.map((room) => {
                 if (room?.group_users_id.includes(data?.[0]?.user_id)) return room.room_id
             })
-
-            // console.log("chats", chats)
             setMessageRooms(chats)
             setLoadingRooms(false)
             return
@@ -73,10 +59,11 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
     }
 
     const handleChatSelection = (chats: any) => {
-        console.log("Chats", chats)
         setSelectedChatRoom(chats)
         router.replace("/chat/" + chats)
     }
+
+    const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
 
     const onSubmit = (formData: any) => {
         submitMessage(data?.[0]?.user_id, formData?.chatMessage).then((result) => {
@@ -105,6 +92,11 @@ const Chat: React.FC<ChatProps> = ({ data }) => {
             return
         }
     }
+
+    if (!data)
+        return (
+            <Protected title="Protected Route" info="This is a protected route" forward='/' />
+        );
 
     return (
         <Layout>
