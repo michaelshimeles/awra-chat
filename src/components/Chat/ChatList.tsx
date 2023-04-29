@@ -1,3 +1,4 @@
+import { useGetChatInfo } from '@/hooks/useGetChatInfo';
 import { HStack, Heading, VStack } from '@chakra-ui/react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from 'react';
@@ -17,12 +18,16 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+
+    const { data: chats } = useGetChatInfo(roomId)
+    // console.log("Data", chats)
+    // console.log("History", chatHistory)
     const getChatInfo = async () => {
 
-        const { data: chatInfo, error } = await supabase
-            .from('messages')
-            .select("*")
-            .eq('room_id', roomId)
+    const { data: chatInfo, error } = await supabase
+        .from('messages')
+        .select("*")
+        .eq('room_id', roomId)
 
         if (chatInfo) {
             setChatHistory(chatInfo)
@@ -47,7 +52,7 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data }) => {
     return (
         <VStack w="full">
             {chatHistory?.map((chat: any, index: any) => (
-                <VStack key={index} border="1px solid" borderColor="gray.900" p="1rem" w="full" _hover={{ cursor: "pointer" , backgroundColor: "whiteAlpha.50"}}>
+                <VStack key={index} border="1px solid" borderColor="gray.900" p="1rem" w="full" _hover={{ cursor: "pointer", backgroundColor: "whiteAlpha.50" }}>
                     <HStack w="full" justify="flex-start" gap="1rem">
                         {chat?.group_users_id?.map((info: any, index: number) => {
                             if (info !== data?.[0]?.user_id) {

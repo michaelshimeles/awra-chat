@@ -130,9 +130,6 @@ const SignUp: React.FC<SignUpProps> = () => {
         </form>
       ) : (
         <HStack>
-          {/* <Button onClick={handleSignOut} variant="outline" rounded="none" w="full">
-            Log out
-          </Button> */}
           <Button onClick={() => router.push("/profile")} variant="outline" rounded="none" w="full">
             Profile
           </Button>

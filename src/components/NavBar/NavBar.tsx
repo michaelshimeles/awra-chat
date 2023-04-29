@@ -1,3 +1,4 @@
+import { useGetUserInfo } from '@/hooks/useGetUserInfo';
 import { HStack, Text } from '@chakra-ui/react';
 import { useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import dynamic from 'next/dynamic';
@@ -13,7 +14,7 @@ interface NavBarProps {
 }
 
 const NavBar: React.FC<NavBarProps> = ({ }) => {
-    const [userInfo, setUserInfo] = useState<any>(null)
+    // const [userInfo, setUserInfo] = useState<any>(null)
     const refreshRouter = useRouter()
     const supabase = useSupabaseClient();
     const router = useRouter()
@@ -21,30 +22,7 @@ const NavBar: React.FC<NavBarProps> = ({ }) => {
     // user session
     const user = useUser();
 
-    useEffect(() => {
-        getUserInfo()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user])
-    // Supabase client setup
-
-    const getUserInfo = async () => {
-
-        let { data: profile, error } = await supabase
-            .from('profile')
-            .select('*')
-            .eq("email", user?.email)
-
-        if (profile) {
-            setUserInfo(profile)
-            return
-        }
-
-        if (error) {
-            console.log(error)
-            return
-        }
-
-    }
+    const { data: userInfo, isLoading: isLoadingFriends } = useGetUserInfo(user?.email)
 
     function handleRefresh() {
         refreshRouter.reload()

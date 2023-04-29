@@ -19,6 +19,7 @@ const Protected: React.FC<ProtectedProps> = ({ title, info, forward }) => {
     }, 2000)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  
   return (
     <Layout>
       <VStack w="full" pt="3rem">
