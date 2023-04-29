@@ -45,15 +45,15 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data }) => {
         if (profile) return profile[0]?.username
     }
     return (
-        <VStack>
+        <VStack w="full">
             {chatHistory?.map((chat: any, index: any) => (
-                <VStack key={index} border="1px solid" borderColor="gray.900" p="1rem" w="10rem" _hover={{ cursor: "pointer" }}>
+                <VStack key={index} border="1px solid" borderColor="gray.900" p="1rem" w="full" _hover={{ cursor: "pointer" , backgroundColor: "whiteAlpha.50"}}>
                     <HStack w="full" justify="flex-start" gap="1rem">
                         {chat?.group_users_id?.map((info: any, index: number) => {
                             if (info !== data?.[0]?.user_id) {
                                 return (
                                     <PromiseWrapper key={index} promise={getUserInfo(info)}>
-                                        {(res: any) => <Heading fontSize="xs">{res}</Heading>}
+                                        {(res: any) => <Heading fontSize="xs">{res.toUpperCase()}</Heading>}
                                     </PromiseWrapper>
                                 );
                             } else {

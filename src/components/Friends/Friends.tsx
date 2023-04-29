@@ -5,6 +5,8 @@ import { UUID } from 'crypto';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useGetFriends } from '@/hooks/useGetFriends';
+import { useGetFriendRequest } from '@/hooks/useGetFriendRequest';
 
 interface FriendsProps {
     data: any
@@ -13,11 +15,7 @@ interface FriendsProps {
 const Friends: React.FC<FriendsProps> = ({ data }) => {
 
     const supabase = useSupabaseClient()
-    const [friendsInfo, setFriendsInfo] = useState<any>([])
     const [friendFriendsInfo, setFriendFriendsInfo] = useState<any>([])
-    const [loadingFriend, setLoadingFriend] = useState<boolean | null>(null)
-    const [friendRequests, setFriendRequests] = useState<any>([])
-    const [loadingFriendRequest, setLoadingFriendRequest] = useState<boolean | null>(null)
     const [searchResult, setSearchResult] = useState<any>([])
     const [value, setValue] = useState<any>("")
     const refreshRouter = useRouter()
@@ -29,119 +27,23 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
             'postgres_changes',
             { event: '*', schema: 'public', table: 'friends' },
             (payload) => {
+
                 console.log('Change received!', payload)
-                getFriends()
-                getFriendRequests()
             }
         )
         .subscribe()
 
-    useEffect(() => {
-        getFriends()
-        getFriendRequests()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
 
     function handleRefresh() {
         refreshRouter.reload()
     }
 
-    const getFriends = async () => {
-        setLoadingFriend(true)
-        const { data: friendData, error } = await supabase
-            .from('friends')
-            .select("friends")
-            .eq('user_id', data[0]?.user_id)
+    // get friends
+    const { data: friendsInfo, isLoading: isLoadingFriends } = useGetFriends(data?.[0]?.user_id)
 
-        let friendsArr: Array<object> = []
+    // get friend requests
+    const { data: friendRequests, isLoading: isLoadingFriendRequest } = useGetFriendRequest(data?.[0]?.user_id)
 
-        const friendsId = friendData?.[0]?.friends
-
-        if (friendData) {
-            await Promise.all(friendsId?.map(async (id: string) => {
-
-                const { data: friendsList, error } = await supabase
-                    .from('profile')
-                    .select()
-                    .eq('user_id', id)
-
-                if (error) {
-                    console.log(error)
-                    return error
-                }
-
-
-                if (friendsList) {
-                    friendsArr?.push(friendsList[0])
-                }
-            }))
-
-            const sortedFriends = friendsArr.sort((a: any, b: any) => {
-                const usernameA = a?.username.toLowerCase()
-                const usernameB = b?.username.toLowerCase()
-                if (usernameA < usernameB) return -1
-                if (usernameA > usernameB) return 1
-                return 0
-            })
-
-            setLoadingFriend(false)
-            return setFriendsInfo(sortedFriends)
-        }
-
-
-        if (error) {
-            console.log(error)
-            return
-        }
-    }
-
-    const getFriendRequests = async () => {
-        setLoadingFriendRequest(true)
-        const { data: friendData, error } = await supabase
-            .from('friends')
-            .select("friend_requests")
-            .eq('user_id', data[0]?.user_id)
-
-        let friendsArr: Array<object> = []
-
-        const friendsId = friendData?.[0]?.friend_requests
-
-        if (friendData) {
-            await Promise.all(friendsId?.map(async (id: string) => {
-
-                const { data: friendsList, error } = await supabase
-                    .from('profile')
-                    .select()
-                    .eq('user_id', id)
-
-                if (error) {
-                    console.log(error)
-                    return error
-                }
-
-
-                if (friendsList) {
-                    friendsArr?.push(friendsList[0])
-                }
-            }))
-
-            const sortedFriends = friendsArr.sort((a: any, b: any) => {
-                const usernameA = a?.username.toLowerCase()
-                const usernameB = b?.username.toLowerCase()
-                if (usernameA < usernameB) return -1
-                if (usernameA > usernameB) return 1
-                return 0
-            })
-            setLoadingFriendRequest(false)
-            return setFriendRequests(sortedFriends)
-        }
-
-
-        if (error) {
-            console.log(error)
-            return
-        }
-    }
 
     const getFriendFriends = async (friendId: any) => {
         const { data: friendData, error } = await supabase
@@ -165,7 +67,6 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                     console.log(error)
                     return error
                 }
-
 
                 if (friendsList) {
                     friendsArr?.push(friendsList[0])
@@ -370,7 +271,7 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                 <VStack>
                     <Heading fontSize="sm">Friends List</Heading>
                     <VStack align="flex-start">
-                        {!loadingFriend ? friendsInfo?.map((friend: any, index: any) => {
+                        {!isLoadingFriends ? friendsInfo?.map((friend: any, index: any) => {
                             return (<HStack key={index} onClick={() => handleMessageFriend(friend?.user_id)} _hover={{
                                 cursor: "pointer"
                             }}>
@@ -384,7 +285,7 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                 <VStack>
                     <Heading fontSize="sm">Friends Request</Heading>
                     <VStack align="flex-start">
-                        {!loadingFriendRequest ? friendRequests?.map((friend: any, index: any) => {
+                        {!isLoadingFriendRequest ? friendRequests?.map((friend: any, index: any) => {
                             return (<HStack key={index}>
                                 <Avatar src={friend?.profile_img} size="sm" />
                                 <Text>{friend?.username}</Text>

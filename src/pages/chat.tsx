@@ -65,14 +65,14 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
 
     return (
         <Layout>
-            <VStack w="100%">
+            <VStack>
                 <HStack align="flex-start" justify="flex-start" pt="5rem" w="80%">
                     <Show above='md'>
                         <VStack w="20%">
                             {!isLoading ? getMessageRooms?.map((chats: any, index: number) => {
                                 if (chats === undefined) return
                                 return (
-                                    <Box key={index} onClick={() => handleChatSelection(chats)}>
+                                    <Box key={index} onClick={() => handleChatSelection(chats)} w="100%">
                                         <ChatList roomId={chats} data={data} />
                                     </Box>
                                 )
@@ -82,11 +82,11 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
                         </VStack>
                     </Show>
                     <Show below='md'>
-                        <VStack w="10%">
+                        <VStack w="20%">
                             {getMessageRooms?.map((chats: any, index: number) => {
                                 if (chats === undefined) return
                                 return (
-                                    <Box key={index} onClick={() => handleChatSelection(chats)}>
+                                    <Box key={index} onClick={() => handleChatSelection(chats)} w="100%">
                                         <ChatList roomId={chats} data={data} />
                                     </Box>
                                 )
