@@ -111,9 +111,9 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
             // searchData.map((result) => {
             //     return result
             // })
-            console.log("friendsInfo", friendsInfo)
-            console.log("friendRequests", friendRequests)
-            console.log("searchData", searchData)
+            // console.log("friendsInfo", friendsInfo)
+            // console.log("friendRequests", friendRequests)
+            // console.log("searchData", searchData)
             setSearchResult(searchData)
         }
 
@@ -176,7 +176,7 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
                 return error
             }
             if (friendFriendsError) {
-                console.log("friendFriendsError", friendFriendsError)
+                // console.log("friendFriendsError", friendFriendsError)
                 return friendFriendsError
             }
 
@@ -192,10 +192,10 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
             return friend.user_id
         })
 
-        console.log("friendRequest", friendRequest)
+        // console.log("friendRequest", friendRequest)
 
         friendRequest.push(data?.[0]?.user_id)
-        console.log("allFriendRequests", friendRequest)
+        // console.log("allFriendRequests", friendRequest)
 
         const { data: friendRequestData, error } = await supabase
             .from('friends')
@@ -204,7 +204,7 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
             .select()
 
         if (friendRequestData) {
-            console.log(friendRequestData)
+            // console.log(friendRequestData)
             handleClearSearch()
             toast({
                 title: 'Friend Request sent.',
@@ -251,13 +251,13 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
             .select()
 
         if (createChatRoom) {
-            console.log(createChatRoom)
+            // console.log(createChatRoom)
             router.push("/chat")
             return
         }
 
         if (createChatRoomError) {
-            console.log(createChatRoomError)
+            // console.log(createChatRoomError)
             router.push("/chat")
             return error
         }

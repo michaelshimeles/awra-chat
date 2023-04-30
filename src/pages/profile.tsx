@@ -74,7 +74,7 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
 
     const onSubmit = async (formData: any) => {
         setUploadSuccess(false)
-        console.log(formData)
+        // console.log(formData)
         setImageUploadLoading(true)
 
         const avatarFileName = formData?.profile_img[0]?.name
@@ -143,14 +143,14 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
 
     const handleImageDelete = async (imageName: string) => {
 
-        console.log(`${data[0]?.user_id}/${imageName}`)
+        // console.log(`${data[0]?.user_id}/${imageName}`)
         const { data: deleteData, error } = await supabase
             .storage
             .from('profile')
             .remove([`${data[0]?.user_id}/${imageName}`])
 
         if (deleteData) {
-            console.log("Deleted", deleteData)
+            // console.log("Deleted", deleteData)
             getUploadedImages()
             return deleteData
         }

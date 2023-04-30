@@ -7,6 +7,11 @@ import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Icon } from '@chakra-ui/react';
+import { useRef } from 'react';
+import { BiMicrophone } from 'react-icons/bi';
+import { BsStopCircle } from "react-icons/bs";
+
 
 const Layout = dynamic(() => import('@/components/Layout/Layout'))
 const ChatList = dynamic(() => import('@/components/Chat/ChatList'))
@@ -18,11 +23,105 @@ interface ChatProps {
 }
 
 
+interface VoiceRecordingProps {
+    roomId: string
+    userId: string
+    audioFile: any
+}
+
+const mimeType = "audio/webm";
+
+const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFile }) => {
+    const mediaRecorder = useRef(null);
+    const [permission, setPermission] = useState<any>(true);
+    const [recordingStatus, setRecordingStatus] = useState<any>("inactive");
+    const [audioChunks, setAudioChunks] = useState<any>([]);
+
+    const supabase = useSupabaseClient()
+
+    const startRecording = async () => {
+        if ("MediaRecorder" in window) {
+            try {
+                const streamData = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: false,
+                });
+                setPermission(true);
+                // setStream(streamData);
+
+                setRecordingStatus("recording");
+
+                //create new Media recorder instance using the stream
+                const media = new MediaRecorder(streamData, { type: mimeType });
+                //set the MediaRecorder instance to the mediaRecorder ref
+                mediaRecorder.current = media;
+                //invokes the start method to start the recording process
+                mediaRecorder.current.start();
+                let localAudioChunks = [];
+                mediaRecorder.current.ondataavailable = (event) => {
+                    if (typeof event.data === "undefined") return;
+                    if (event.data.size === 0) return;
+                    localAudioChunks.push(event.data);
+                };
+                setAudioChunks(localAudioChunks);
+            } catch (err) {
+                alert(err.message);
+            }
+        } else {
+            alert("The MediaRecorder API is not supported in your browser.");
+        }
+
+    };
+
+    const stopRecording = () => {
+        setRecordingStatus("inactive");
+        //stops the recording instance
+        mediaRecorder.current.stop();
+        mediaRecorder.current.onstop = async () => {
+
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(audioChunks[0]);
+            fileReader.onload = async () => {
+
+                const base64data = fileReader.result;
+                const { data: sendingAudioMessage, error } = await supabase
+                    .from('chatmessages')
+                    .insert([
+                        { room_id: roomId, user_id: userId, message: base64data, audio: true },
+                    ])
+
+                if (error) {
+                    console.log(error)
+                    return error
+                }
+
+                if (sendingAudioMessage) {
+                    audioFile(base64data)
+                    return
+                }
+            };
+
+        };
+    };
+
+    return (
+        <VStack>
+            <VStack>
+                {permission && recordingStatus === "inactive" ? (
+                    <Icon onClick={startRecording} type="button" as={BiMicrophone} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.100" rounded="full"/>
+                ) : null}
+                {recordingStatus === "recording" ? (
+                    <Icon onClick={stopRecording} type="button" as={BsStopCircle} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.100" rounded="full"/>
+                ) : null}
+            </VStack>
+        </VStack>
+    );
+}
+
 export const Chat: React.FC<ChatProps> = ({ data, children }) => {
     const { data: getMessageRooms, isLoading } = useGetMessageRoom(data?.[0]?.user_id);
-    console.log("getMessageRooms", getMessageRooms)
     const [selectedChat, setSelectedChat] = useState<any>(null)
-
+    const [audio, setAudio] = useState<any>(null)
     const supabase = useSupabaseClient()
 
     const handleChatSelection = (chats: any) => {
@@ -32,9 +131,7 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
 
     const onSubmit = (formData: any) => {
         submitMessage(data?.[0]?.user_id, formData?.chatMessage).then((result) => {
-            console.log("result", result)
             reset()
-            // refreshHistory();
         })
     }
 
@@ -53,7 +150,6 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
         }
 
         if (sendingMessageData) {
-            console.log("sendingMessageData", data)
             return
         }
     }
@@ -94,11 +190,12 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
                         </VStack>
                     </Show>
                     {selectedChat ? <VStack w="80%">
-                        <ChatHistory roomId={selectedChat} userId={data?.[0]?.user_id} />
+                        <ChatHistory roomId={selectedChat} userId={data?.[0]?.user_id} audio={audio} />
                         <VStack w="full">
                             <Box w="100%">
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <HStack w="full">
+                                        <VoiceRecording roomId={selectedChat} userId={data?.[0]?.user_id} audioFile={setAudio} />
                                         <Textarea rounded="none" {...register("chatMessage", { required: true })} />
                                         <Button type="submit" rounded="none" variant="outline" h="5rem">Send</Button>
                                     </HStack>

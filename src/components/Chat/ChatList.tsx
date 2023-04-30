@@ -19,7 +19,7 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data }) => {
     }, [])
 
 
-    const { data: chats } = useGetChatInfo(roomId)
+    // const { data: chats } = useGetChatInfo(roomId)
     // console.log("Data", chats)
     // console.log("History", chatHistory)
     const getChatInfo = async () => {
