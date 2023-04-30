@@ -1,6 +1,6 @@
 import { Avatar, HStack, Text, VStack } from '@chakra-ui/react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 
 
 
@@ -76,7 +76,10 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId, audio }) => {
         return url;
     };
 
-
+    const audioStyle: CSSProperties = {
+        height: '30px',
+        borderRadius: "20rem"
+    };
 
     return (
         <VStack ref={chatHistoryRef} border="1px solid" borderColor="gray.900" p="1rem" w="full" h="41.875rem" bgColor="gray.900" overflow="auto">
@@ -90,7 +93,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId, audio }) => {
                                 <HStack p="0.5rem" border="1px solid" borderColor="gray.900" rounded="xl" bgColor="black">
                                     <Avatar size="sm" />
                                     <HStack>
-                                        {chat?.audio ? <audio src={base64toBlob(chat?.message)} controls></audio> : <Text fontSize="sm">{chat?.message}</Text>}
+                                        {chat?.audio ? <audio src={base64toBlob(chat?.message)} controls style={audioStyle}></audio> : <Text fontSize="sm">{chat?.message}</Text>}
                                         <Text fontSize="xx-small">{new Date(chat?.created_at).toLocaleTimeString() + " " + new Date(chat?.created_at).toLocaleDateString()}</Text>
                                     </HStack>
                                 </HStack>
@@ -102,7 +105,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId, audio }) => {
                                     <HStack p="0.5rem" border="1px solid" borderColor="gray.900" rounded="xl" bgColor="black">
                                         <Avatar size="sm" />
                                         <HStack>
-                                            {chat?.audio ? <audio src={base64toBlob(chat?.message)} controls></audio> : <Text fontSize="sm">{chat?.message}</Text>}
+                                            {chat?.audio ? <audio src={base64toBlob(chat?.message)} controls style={audioStyle}></audio> : <Text fontSize="sm">{chat?.message}</Text>}
                                             <Text fontSize="xx-small">{new Date(chat?.created_at).toLocaleTimeString() + " " + new Date(chat?.created_at).toLocaleDateString()}</Text>
                                         </HStack>
                                     </HStack>

@@ -32,7 +32,7 @@ interface VoiceRecordingProps {
 const mimeType = "audio/webm";
 
 const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFile }) => {
-    const mediaRecorder = useRef(null);
+    const mediaRecorder = useRef<MediaRecorder | null>(null);
     const [permission, setPermission] = useState<any>(true);
     const [recordingStatus, setRecordingStatus] = useState<any>("inactive");
     const [audioChunks, setAudioChunks] = useState<any>([]);
@@ -53,12 +53,16 @@ const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFi
                 // create a new Blob object
 
                 //create new Media recorder instance using the stream
-                const media = new MediaRecorder(streamData, { type: mimeType });
+                // const media: MediaRecorder = new MediaRecorder(streamData, { type: mimeType });
+                const media: MediaRecorder = new MediaRecorder(streamData, {
+                    mimeType: 'audio/webm;codecs=opus',
+                    // audioBitsPerSecond: 128000
+                });
                 //set the MediaRecorder instance to the mediaRecorder ref
                 mediaRecorder.current = media;
                 //invokes the start method to start the recording process
                 mediaRecorder.current.start();
-                let localAudioChunks = [];
+                let localAudioChunks: any = [];
                 mediaRecorder.current.ondataavailable = (event) => {
                     if (typeof event.data === "undefined") return;
                     if (event.data.size === 0) return;
@@ -66,7 +70,7 @@ const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFi
                 };
                 setAudioChunks(localAudioChunks);
             } catch (err) {
-                alert(err.message);
+                alert(err);
             }
         } else {
             alert("The MediaRecorder API is not supported in your browser.");
@@ -77,32 +81,35 @@ const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFi
     const stopRecording = () => {
         setRecordingStatus("inactive");
         //stops the recording instance
-        mediaRecorder.current.stop();
-        mediaRecorder.current.onstop = async () => {
+        mediaRecorder.current?.stop();
+        if (mediaRecorder.current) {
+            mediaRecorder.current.onstop = async () => {
 
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(audioChunks[0]);
-            fileReader.onload = async () => {
 
-                const base64data = fileReader.result;
-                const { data: sendingAudioMessage, error } = await supabase
-                    .from('chatmessages')
-                    .insert([
-                        { room_id: roomId, user_id: userId, message: base64data, audio: true },
-                    ])
+                const fileReader = new FileReader();
+                fileReader.readAsDataURL(audioChunks[0]);
+                fileReader.onload = async () => {
 
-                if (error) {
-                    console.log(error)
-                    return error
-                }
+                    const base64data = fileReader.result;
+                    const { data: sendingAudioMessage, error } = await supabase
+                        .from('chatmessages')
+                        .insert([
+                            { room_id: roomId, user_id: userId, message: base64data, audio: true },
+                        ])
 
-                if (sendingAudioMessage) {
-                    audioFile(base64data)
-                    return
-                }
+                    if (error) {
+                        console.log(error)
+                        return error
+                    }
+
+                    if (sendingAudioMessage) {
+                        audioFile(base64data)
+                        return
+                    }
+                };
+
             };
-
-        };
+        }
     };
 
     return (
