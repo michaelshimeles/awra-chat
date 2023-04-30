@@ -2,6 +2,7 @@
 
 const nextConfig = {
   reactStrictMode: true,
+  quiet: true,
   images: {
     domains: [process.env.NEXT_PUBLIC_SUPABASE_URL],
   },

@@ -50,6 +50,7 @@ const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFi
                 // setStream(streamData);
 
                 setRecordingStatus("recording");
+                // create a new Blob object
 
                 //create new Media recorder instance using the stream
                 const media = new MediaRecorder(streamData, { type: mimeType });
@@ -108,10 +109,10 @@ const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFi
         <VStack>
             <VStack>
                 {permission && recordingStatus === "inactive" ? (
-                    <Icon onClick={startRecording} type="button" as={BiMicrophone} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.100" rounded="full"/>
+                    <Icon onClick={startRecording} type="button" as={BiMicrophone} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.100" rounded="full" />
                 ) : null}
                 {recordingStatus === "recording" ? (
-                    <Icon onClick={stopRecording} type="button" as={BsStopCircle} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.100" rounded="full"/>
+                    <Icon onClick={stopRecording} type="button" as={BsStopCircle} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.100" rounded="full" />
                 ) : null}
             </VStack>
         </VStack>
