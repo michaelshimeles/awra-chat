@@ -107,13 +107,6 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
         }
 
         if (searchData) {
-            // Do something with the retrieved data
-            // searchData.map((result) => {
-            //     return result
-            // })
-            // console.log("friendsInfo", friendsInfo)
-            // console.log("friendRequests", friendRequests)
-            // console.log("searchData", searchData)
             setSearchResult(searchData)
         }
 

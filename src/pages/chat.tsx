@@ -129,6 +129,7 @@ const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFi
 export const Chat: React.FC<ChatProps> = ({ data, children }) => {
     const { data: getMessageRooms, isLoading } = useGetMessageRoom(data?.[0]?.user_id);
     const [selectedChat, setSelectedChat] = useState<any>(null)
+    const [highlightedChat, setHighlightedChat] = useState<any>(null)
     const [audio, setAudio] = useState<any>(null)
     const supabase = useSupabaseClient()
 
@@ -162,6 +163,10 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
         }
     }
 
+    const handleBorderSelect = (chats: any) => {
+        setHighlightedChat(chats)
+    }
+
     if (!data)
         return (
             <Protected title="Protected Route" info="This is a protected route" forward='/' />
@@ -176,8 +181,11 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
                             {!isLoading ? getMessageRooms?.map((chats: any, index: number) => {
                                 if (chats === undefined) return
                                 return (
-                                    <Box key={index} onClick={() => handleChatSelection(chats)} w="100%">
-                                        <ChatList roomId={chats} data={data} />
+                                    <Box key={index} onClick={() => {
+                                        handleChatSelection(chats)
+                                        handleBorderSelect(chats)
+                                    }} w="100%">
+                                        <ChatList roomId={chats} data={data} highlightedChat={highlightedChat} />
                                     </Box>
                                 )
                             }) : <VStack>
@@ -191,7 +199,7 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
                                 if (chats === undefined) return
                                 return (
                                     <Box key={index} onClick={() => handleChatSelection(chats)} w="100%">
-                                        <ChatList roomId={chats} data={data} />
+                                        <ChatList roomId={chats} data={data} highlightedChat={highlightedChat} />
                                     </Box>
                                 )
                             })}

@@ -6,11 +6,14 @@ import React, { useEffect, useState } from 'react';
 interface ChatListProps {
     roomId: string
     data: any
+    highlightedChat: any
 }
 
-const ChatList: React.FC<ChatListProps> = ({ roomId, data }) => {
+const ChatList: React.FC<ChatListProps> = ({ roomId, data, highlightedChat }) => {
 
     const [chatHistory, setChatHistory] = useState<any>(null)
+    const [selected, setSelected] = useState<any>(null)
+
     const supabase = useSupabaseClient()
 
     useEffect(() => {
@@ -18,16 +21,12 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data }) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-
-    // const { data: chats } = useGetChatInfo(roomId)
-    // console.log("Data", chats)
-    // console.log("History", chatHistory)
     const getChatInfo = async () => {
 
-    const { data: chatInfo, error } = await supabase
-        .from('messages')
-        .select("*")
-        .eq('room_id', roomId)
+        const { data: chatInfo, error } = await supabase
+            .from('messages')
+            .select("*")
+            .eq('room_id', roomId)
 
         if (chatInfo) {
             setChatHistory(chatInfo)
@@ -49,10 +48,17 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data }) => {
 
         if (profile) return profile[0]?.username
     }
+
+    const handleChatSelection = () => {
+        setSelected(true)
+    }
+
+    console.log("highlightedChat", highlightedChat)
+
     return (
         <VStack w="full">
             {chatHistory?.map((chat: any, index: any) => (
-                <VStack key={index} border="1px solid" borderColor="gray.900" p="1rem" w="full" _hover={{ cursor: "pointer", backgroundColor: "whiteAlpha.50" }}>
+                (chat?.room_id === highlightedChat ? <VStack key={index} border="1px solid" borderColor="gray.500" p="1rem" w="full" _hover={{ cursor: "pointer", backgroundColor: "whiteAlpha.50" }} onClick={handleChatSelection}>
                     <HStack w="full" justify="flex-start" gap="1rem">
                         {chat?.group_users_id?.map((info: any, index: number) => {
                             if (info !== data?.[0]?.user_id) {
@@ -66,7 +72,21 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data }) => {
                             }
                         })}
                     </HStack>
-                </VStack>
+                </VStack> : <VStack key={index} border="1px solid" borderColor="gray.900" p="1rem" w="full" _hover={{ cursor: "pointer", backgroundColor: "whiteAlpha.50" }} onClick={handleChatSelection}>
+                    <HStack w="full" justify="flex-start" gap="1rem">
+                        {chat?.group_users_id?.map((info: any, index: number) => {
+                            if (info !== data?.[0]?.user_id) {
+                                return (
+                                    <PromiseWrapper key={index} promise={getUserInfo(info)}>
+                                        {(res: any) => <Heading fontSize="xs">{res.toUpperCase()}</Heading>}
+                                    </PromiseWrapper>
+                                );
+                            } else {
+                                return null;
+                            }
+                        })}
+                    </HStack>
+                </VStack>)
             ))}
         </VStack>
     );
