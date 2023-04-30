@@ -16,8 +16,13 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId, audio }) => {
 
     const [chatHistory, setChatHistory] = useState<any>([])
     const supabase = useSupabaseClient()
+    // const textSound = new Audio('/text-sound.mp3');
 
     const chatHistoryRef = useRef<HTMLDivElement>(null);
+
+    const audioElement = document.createElement('audio');
+    audioElement.setAttribute('src', '/text-sound.m4a');
+
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -29,7 +34,11 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId, audio }) => {
                 (payload) => {
                     console.log('Change received!', payload)
                     console.log("Event type", payload.eventType)
+
                     getMessages()
+                    if (payload?.new && typeof payload.new === 'object' && 'user_id' in payload.new && payload.new.user_id !== userId) {
+                        audioElement.play();
+                    }
                 }
             )
             .subscribe()
