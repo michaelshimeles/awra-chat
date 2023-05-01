@@ -29,7 +29,6 @@ interface VoiceRecordingProps {
     audioFile: any
 }
 
-const mimeType = "audio/webm";
 
 const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFile }) => {
     const mediaRecorder = useRef<MediaRecorder | null>(null);
@@ -128,6 +127,7 @@ const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFi
 
 export const Chat: React.FC<ChatProps> = ({ data, children }) => {
     const { data: getMessageRooms, isLoading } = useGetMessageRoom(data?.[0]?.user_id);
+
     const [selectedChat, setSelectedChat] = useState<any>(null)
     const [highlightedChat, setHighlightedChat] = useState<any>(null)
     const [audio, setAudio] = useState<any>(null)
@@ -148,7 +148,7 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
         const { data: sendingMessageData, error } = await supabase
             .from('chatmessages')
             .insert({
-                room_id: selectedChat,
+                room_id: selectedChat?.room_id,
                 user_id: userId,
                 message: message
             });
@@ -179,13 +179,12 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
                     <Show above='md'>
                         <VStack w="20%">
                             {!isLoading ? getMessageRooms?.map((chats: any, index: number) => {
-                                if (chats === undefined) return
                                 return (
                                     <Box key={index} onClick={() => {
                                         handleChatSelection(chats)
-                                        handleBorderSelect(chats)
+                                        handleBorderSelect(chats?.room_id)
                                     }} w="100%">
-                                        <ChatList roomId={chats} data={data} highlightedChat={highlightedChat} />
+                                        <ChatList roomId={chats?.room_id} data={data} highlightedChat={highlightedChat} />
                                     </Box>
                                 )
                             }) : <VStack>
@@ -196,17 +195,20 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
                     <Show below='md'>
                         <VStack w="20%">
                             {getMessageRooms?.map((chats: any, index: number) => {
-                                if (chats === undefined) return
+                                if (chats === undefined || chats === null) return
                                 return (
-                                    <Box key={index} onClick={() => handleChatSelection(chats)} w="100%">
-                                        <ChatList roomId={chats} data={data} highlightedChat={highlightedChat} />
+                                    <Box key={index} onClick={() => {
+                                        handleChatSelection(chats)
+                                        handleBorderSelect(chats?.room_id)
+                                    }} w="100%">
+                                        <ChatList roomId={chats?.room_id} data={data} highlightedChat={highlightedChat} />
                                     </Box>
                                 )
                             })}
                         </VStack>
                     </Show>
                     {selectedChat ? <VStack w="80%">
-                        <ChatHistory roomId={selectedChat} userId={data?.[0]?.user_id} audio={audio} />
+                        <ChatHistory chatRoom={selectedChat} roomId={selectedChat?.room_id} userId={data?.[0]?.user_id} audio={audio} />
                         <VStack w="full">
                             <Box w="100%">
                                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -255,7 +257,6 @@ export const getServerSideProps = async (ctx: any) => {
         .select()
         .eq("email", `${session?.user?.email}`)
 
-    // if (userProfileData) console.log("Success", userProfileData)
     if (userProfileError) console.log("Error", userProfileError)
     return {
         props: {

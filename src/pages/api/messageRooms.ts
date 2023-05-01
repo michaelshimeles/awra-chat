@@ -12,7 +12,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (messages) {
     const chats = messages.map((room) => {
       if (room?.group_users_id.includes(req.query?.user_id))
-        return room.room_id;
+      console.log("Room", room)
+        return room;
     });
 
     res.status(200).json(chats);

@@ -5,17 +5,20 @@ import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 
 
 interface ChatHistoryProps {
-    roomId: any
+    chatRoom: any
     userId: any
     audio: any
+    roomId: any
 }
 
 // const mimeType = "audio/webm";
 
-const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId, audio }) => {
+const ChatHistory: React.FC<ChatHistoryProps> = ({ chatRoom, userId, audio, roomId }) => {
 
+    // console.log("roomId", chatRoom)
     const [chatHistory, setChatHistory] = useState<any>([])
     const supabase = useSupabaseClient()
+    const [userInfo, setUserInfo] = useState<any>([])
     // const textSound = new Audio('/text-sound.mp3');
 
     const chatHistoryRef = useRef<HTMLDivElement>(null);
@@ -63,6 +66,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId, audio }) => {
 
         if (data) {
             setChatHistory(data)
+            getUserInfo()
             return data
         }
 
@@ -70,6 +74,28 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId, audio }) => {
             console.log(error)
             return error
         }
+    }
+
+    const getUserInfo = async () => {
+        chatRoom?.group_users_id?.map(async (user: string) => {
+            const { data, error } = await supabase
+                .from('profile')
+                .select(`
+          *
+        `)
+                .eq('user_id', user)
+
+            if (data) {
+                setUserInfo([...userInfo, data])
+                return data
+            }
+
+            if (error) {
+                console.log(error)
+                return error
+            }
+        })
+
     }
 
     const base64toBlob = (base64Data: string) => {
@@ -90,9 +116,14 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ roomId, userId, audio }) => {
         borderRadius: "20rem"
     };
 
+    // console.log("UserInfo", userInfo)
+
     return (
         <VStack ref={chatHistoryRef} border="1px solid" borderColor="gray.900" p="1rem" w="full" h="41.875rem" bgColor="gray.900" overflow="auto">
             {chatHistory?.length > 0 && chatHistory?.map((chat: any, index: number) => {
+
+                // console.log("userInfo[index]?.[0]?.username", userInfo[index]?.[0]?.username)
+
                 return (
                     <VStack w="100%" key={chat?.id}>
                         {(chat?.user_id) !== (userId) ?

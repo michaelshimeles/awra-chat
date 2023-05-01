@@ -49,16 +49,16 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data, highlightedChat }) =>
         if (profile) return profile[0]?.username
     }
 
-    const handleChatSelection = () => {
-        setSelected(true)
-    }
-
-    console.log("highlightedChat", highlightedChat)
+    // const handleChatSelection = () => {
+    //     setSelected(true)
+    // }
 
     return (
         <VStack w="full">
             {chatHistory?.map((chat: any, index: any) => (
-                (chat?.room_id === highlightedChat ? <VStack key={index} border="1px solid" borderColor="gray.500" p="1rem" w="full" _hover={{ cursor: "pointer", backgroundColor: "whiteAlpha.50" }} onClick={handleChatSelection}>
+
+                (chat?.room_id === highlightedChat ? <VStack key={index} border="1px solid" borderColor="gray.500" p="1rem" w="full" _hover={{ cursor: "pointer", backgroundColor: "whiteAlpha.50" }}>
+
                     <HStack w="full" justify="flex-start" gap="1rem">
                         {chat?.group_users_id?.map((info: any, index: number) => {
                             if (info !== data?.[0]?.user_id) {
@@ -72,7 +72,7 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data, highlightedChat }) =>
                             }
                         })}
                     </HStack>
-                </VStack> : <VStack key={index} border="1px solid" borderColor="gray.900" p="1rem" w="full" _hover={{ cursor: "pointer", backgroundColor: "whiteAlpha.50" }} onClick={handleChatSelection}>
+                </VStack> : <VStack key={index} border="1px solid" borderColor="gray.900" p="1rem" w="full" _hover={{ cursor: "pointer", backgroundColor: "whiteAlpha.50" }}>
                     <HStack w="full" justify="flex-start" gap="1rem">
                         {chat?.group_users_id?.map((info: any, index: number) => {
                             if (info !== data?.[0]?.user_id) {
@@ -111,6 +111,7 @@ function PromiseWrapper({ promise, children }: PromiseWrapperProps) {
     if (result === null) {
         return <></>; // Or some kind of loading state
     }
+
     return <>{children(result)}</>;
 }
 
