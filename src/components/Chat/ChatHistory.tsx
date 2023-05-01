@@ -15,17 +15,13 @@ interface ChatHistoryProps {
 
 const ChatHistory: React.FC<ChatHistoryProps> = ({ chatRoom, userId, audio, roomId }) => {
 
-    // console.log("roomId", chatRoom)
-    const [chatHistory, setChatHistory] = useState<any>([])
     const supabase = useSupabaseClient()
+    const [chatHistory, setChatHistory] = useState<any>([])
     const [userInfo, setUserInfo] = useState<any>([])
-    // const textSound = new Audio('/text-sound.mp3');
-
     const chatHistoryRef = useRef<HTMLDivElement>(null);
 
     const audioElement = document.createElement('audio');
     audioElement.setAttribute('src', '/text-sound.m4a');
-
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -116,13 +112,9 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ chatRoom, userId, audio, room
         borderRadius: "20rem"
     };
 
-    // console.log("UserInfo", userInfo)
-
     return (
         <VStack ref={chatHistoryRef} border="1px solid" borderColor="gray.900" p="1rem" w="full" h="41.875rem" bgColor="gray.900" overflow="auto">
             {chatHistory?.length > 0 && chatHistory?.map((chat: any, index: number) => {
-
-                // console.log("userInfo[index]?.[0]?.username", userInfo[index]?.[0]?.username)
 
                 return (
                     <VStack w="100%" key={chat?.id}>

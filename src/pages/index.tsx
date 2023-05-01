@@ -19,15 +19,14 @@ const Login = dynamic(() => import('@/components/Login/Login'));
 const SignUp = dynamic(() => import('@/components/SignUp/SignUp'));
 
 interface HomeProps {
+  userServer: any
 }
 
-const Home: React.FC<HomeProps> = ({ }) => {
+const Home: React.FC<HomeProps> = ({ userServer }) => {
 
   const router = useRouter()
-  // user session
-  const user = useUser();
-
-
+  const user = useUser()
+  
   return (
     <Layout>
       <Head>
@@ -79,12 +78,16 @@ export const getServerSideProps = async (ctx: any) => {
     data: { session },
   } = await supabase.auth.getSession();
 
+
   if (!session)
     return {
       props: {
-        user: null,
+        userServer: null,
       },
     };
+
+  // Run queries with RLS on the server
+
 
   return {
     props: {

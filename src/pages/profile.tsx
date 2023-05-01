@@ -1,11 +1,12 @@
 import { DeleteIcon } from '@chakra-ui/icons';
-import { Avatar, Box, Button, Editable, EditableInput, EditablePreview, HStack, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, VStack, useDisclosure, useToast } from '@chakra-ui/react';
+import { Avatar, Box, Button, Editable, EditableInput, EditablePreview, Flex, HStack, Image, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Tooltip, VStack, useDisclosure, useToast } from '@chakra-ui/react';
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import dynamic from 'next/dynamic';
+import { InfoIcon } from "@chakra-ui/icons"
 
 const ShakingButton = dynamic(
     () => import('@/components/Button/ShakingButton/ShakingButton')
@@ -121,7 +122,6 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
     };
 
     const handleMakeProfilePic = async (image: string) => {
-        // console.log("User ID", data[0]?.user_id)
         setProfileLoading(true)
 
         const { data: profileImageData, error } = await supabase
@@ -142,15 +142,12 @@ const ProfileImagePicker: React.FC<ProfileImagePickerProps> = ({ isOpen, onClose
     }
 
     const handleImageDelete = async (imageName: string) => {
-
-        // console.log(`${data[0]?.user_id}/${imageName}`)
         const { data: deleteData, error } = await supabase
             .storage
             .from('profile')
             .remove([`${data[0]?.user_id}/${imageName}`])
 
         if (deleteData) {
-            // console.log("Deleted", deleteData)
             getUploadedImages()
             return deleteData
         }
@@ -256,17 +253,6 @@ const Profile: React.FC<profileProps> = ({ user, data }) => {
             <Protected title="Protected Route" info="This is a protected route" forward='/' />
         );
 
-    // Signing out user
-    const handleSignOut = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-            return error;
-        }
-        console.log("Signed out")
-        handleRefresh()
-        return;
-    };
-
 
     const handleFirstName = async (firstName: any) => {
         if (data[0]?.first_name === firstName) return
@@ -353,7 +339,7 @@ const Profile: React.FC<profileProps> = ({ user, data }) => {
                 <HStack border="1px solid" rounded="sm" p="2rem" gap="1rem" borderColor="gray.900" w={["15rem", "25rem"]} justify="center" align='center'>
                     <Avatar src={data[0]?.profile_img} bgColor="blue.700" _hover={{ cursor: "pointer" }} onClick={onOpen} border="1px solid" borderColor="gray.900" size="xl" />
                     <VStack>
-                        <Editable defaultValue={data[0]?.first_name} w="full" onSubmit={handleFirstName} >
+                        <Editable defaultValue={data[0]?.first_name} w="full" onSubmit={handleFirstName}>
                             <EditablePreview />
                             <EditableInput rounded="none" w="full" />
                         </Editable>
@@ -370,7 +356,14 @@ const Profile: React.FC<profileProps> = ({ user, data }) => {
                 <HStack>
                     {/* <Button rounded="none" variant="outline" onClick={handleSignOut}>Log out</Button> */}
                     <ShakingButton onClick={() => router.push("/chat")}>Chat</ShakingButton>
-                    <ShakingButton onClick={() => console.log("Build")}>Need a Friend</ShakingButton>
+                    <Tooltip hasArrow label='Coming soon' bg='gray.900' color='black' textColor="white">
+                        <VStack>
+                            <ShakingButton onClick={() => console.log("Build")}>Need a Friend</ShakingButton>
+                        </VStack>
+                    </Tooltip>
+                    <Tooltip hasArrow label='You can change your First, Last & User name by just clicking on them. You can upload a new profile picture by click on the avatar' bg='gray.900' color='black' textColor="white">
+                        <InfoIcon />
+                    </Tooltip>
                 </HStack>
                 <ProfileImagePicker isOpen={isOpen} onClose={onClose} data={data} />
                 <Friends data={data} />
@@ -405,7 +398,6 @@ export const getServerSideProps = async (ctx: any) => {
         .select()
         .eq("email", `${session?.user?.email}`)
 
-    // if (userProfileData) console.log("Success", userProfileData)
     if (userProfileError) console.log("Error", userProfileError)
     return {
         props: {

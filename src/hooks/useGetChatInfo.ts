@@ -9,7 +9,6 @@ function fetchChatInfo(roomId: string) {
       },
     })
     .then((result) => {
-      console.log("result", result?.data);
       return result?.data;
     })
     .catch((error) => {
