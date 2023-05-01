@@ -24,7 +24,7 @@ interface ChatProps {
 
 
 interface VoiceRecordingProps {
-    roomId: string
+    roomId: any
     userId: string
     audioFile: any
 }
@@ -93,7 +93,7 @@ const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFi
                     const { data: sendingAudioMessage, error } = await supabase
                         .from('chatmessages')
                         .insert([
-                            { room_id: roomId, user_id: userId, message: base64data, audio: true },
+                            { room_id: roomId?.room_id, user_id: userId, message: base64data, audio: true },
                         ])
 
                     if (error) {
