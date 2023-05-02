@@ -19,12 +19,13 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ chatRoom, userId, audio, room
     const [chatHistory, setChatHistory] = useState<any>([])
     const chatHistoryRef = useRef<HTMLDivElement>(null);
 
-    const audioElement = document.createElement('audio');
-    audioElement.setAttribute('src', '/text-sound.m4a');
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
         getMessages()
+        const audioElement = document?.createElement('audio');
+        audioElement.setAttribute('src', '/text-sound.m4a');
+
         const chatmessages = supabase.channel('custom-all-channel')
             .on(
                 'postgres_changes',

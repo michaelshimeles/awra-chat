@@ -217,10 +217,6 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
 
     const handleMessageFriend = async (friendId: UUID) => {
 
-        const { data: messages, error } = await supabase
-            .from('messages')
-            .select('room_id')
-
         const myId = data?.[0]?.user_id
 
         const roomId = [myId, friendId]
@@ -238,20 +234,26 @@ const Friends: React.FC<FriendsProps> = ({ data }) => {
 
         let roomCode = `${roomId[0].substr(0, 5) + "_" + roomId[1].substr(0, 5)}`
 
+        const room_id = uuidv4()
+
         const { data: createChatRoom, error: createChatRoomError } = await supabase
             .from('messages')
-            .insert({ room_id: uuidv4(), group_users_id: [data?.[0]?.user_id, friendId], room_code: roomCode })
+            .insert({ room_id, group_users_id: [data?.[0]?.user_id, friendId], room_code: roomCode })
             .select()
 
+        const { data: existingMessageRoom, error } = await supabase
+            .from('messages')
+            .select('room_id')
+            .contains('group_users_id', [data?.[0]?.user_id, friendId]);
+
         if (createChatRoom) {
-            // console.log(createChatRoom)
-            router.push("/chat")
+            router.push("/chat/" + room_id)
             return
         }
 
         if (createChatRoomError) {
-            // console.log(createChatRoomError)
-            router.push("/chat")
+            // This means chat room already exists
+            router.push("/chat/" + existingMessageRoom?.[0]?.room_id)
             return error
         }
 

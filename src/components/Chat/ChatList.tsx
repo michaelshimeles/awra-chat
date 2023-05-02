@@ -1,7 +1,7 @@
-import { useGetChatInfo } from '@/hooks/useGetChatInfo';
 import { HStack, Heading, VStack } from '@chakra-ui/react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 
 interface ChatListProps {
     roomId: string
@@ -13,6 +13,7 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data, highlightedChat }) =>
 
     const [chatHistory, setChatHistory] = useState<any>(null)
     const supabase = useSupabaseClient()
+    const router = useRouter()
     useEffect(() => {
         getChatInfo()
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -51,7 +52,7 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data, highlightedChat }) =>
         <VStack w="full">
             {chatHistory?.map((chat: any, index: any) => (
 
-                (chat?.room_id === highlightedChat ? <VStack key={index} border="1px solid" borderColor="gray.500" p="1rem" w="full" _hover={{ cursor: "pointer", backgroundColor: "whiteAlpha.50" }}>
+                (chat?.room_id === router?.query?.id ? <VStack key={index} border="1px solid" borderColor="gray.500" p="1rem" w="full" _hover={{ cursor: "pointer", backgroundColor: "whiteAlpha.50" }}>
 
                     <HStack w="full" justify="flex-start" gap="1rem">
                         {chat?.group_users_id?.map((info: any, index: number) => {

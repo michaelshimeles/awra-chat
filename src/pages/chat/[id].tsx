@@ -11,6 +11,7 @@ import { Icon } from '@chakra-ui/react';
 import { useRef } from 'react';
 import { BiMicrophone } from 'react-icons/bi';
 import { BsStopCircle } from "react-icons/bs";
+import { useRouter } from 'next/router';
 
 
 const Layout = dynamic(() => import('@/components/Layout/Layout'))
@@ -118,22 +119,26 @@ const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFi
                     <Icon boxSize={6} onClick={startRecording} type="button" as={BiMicrophone} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.50" rounded="full" />
                 ) : null}
                 {recordingStatus === "recording" ? (
-                    <Icon boxSize={6} onClick={stopRecording} type="button" as={BsStopCircle} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.50" rounded="full" color="red"/>
+                    <Icon boxSize={6} onClick={stopRecording} type="button" as={BsStopCircle} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.50" rounded="full" color="red" />
                 ) : null}
             </VStack>
         </VStack>
     );
 }
 
-export const Chat: React.FC<ChatProps> = ({ data, children }) => {
+export const ChatLog: React.FC<ChatProps> = ({ data, children }) => {
     const { data: getMessageRooms, isLoading } = useGetMessageRoom(data?.[0]?.user_id);
 
     const [selectedChat, setSelectedChat] = useState<any>(null)
     const [highlightedChat, setHighlightedChat] = useState<any>(null)
     const [audio, setAudio] = useState<any>(null)
     const supabase = useSupabaseClient()
+    const router = useRouter()
+
+    console.log("Query", router.query.id)
 
     const handleChatSelection = (chats: any) => {
+        router.push("/chat/" + chats?.room_id)
         setSelectedChat(chats)
     }
     const { register, handleSubmit, watch, formState: { errors }, reset } = useForm();
@@ -163,8 +168,8 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
         }
     }
 
-    const handleBorderSelect = (chats: any) => {
-        setHighlightedChat(chats)
+    const handleBorderSelect = () => {
+        setHighlightedChat(router.query.id)
     }
 
     if (!data)
@@ -182,7 +187,7 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
                                 return (
                                     <Box key={index} onClick={() => {
                                         handleChatSelection(chats)
-                                        handleBorderSelect(chats?.room_id)
+                                        handleBorderSelect()
                                     }} w="100%">
                                         <ChatList roomId={chats?.room_id} data={data} highlightedChat={highlightedChat} />
                                     </Box>
@@ -199,7 +204,7 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
                                 return (
                                     <Box key={index} onClick={() => {
                                         handleChatSelection(chats)
-                                        handleBorderSelect(chats?.room_id)
+                                        handleBorderSelect()
                                     }} w="100%">
                                         <ChatList roomId={chats?.room_id} data={data} highlightedChat={highlightedChat} />
                                     </Box>
@@ -207,8 +212,8 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
                             })}
                         </VStack>
                     </Show>
-                    {selectedChat ? <VStack w="80%">
-                        <ChatHistory chatRoom={selectedChat} roomId={selectedChat?.room_id} userId={data?.[0]?.user_id} audio={audio} />
+                    {<VStack w="80%">
+                        <ChatHistory chatRoom={router.query.id} roomId={router.query.id} userId={data?.[0]?.user_id} audio={audio} />
                         <VStack w="full">
                             <Box w="100%">
                                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -220,10 +225,6 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
                                 </form>
                             </Box>
                         </VStack>
-                    </VStack> : <VStack w="100%" justify="center" h="7rem">
-                        <Center>
-                            <Heading>No chat selected</Heading>
-                        </Center>
                     </VStack>}
                 </HStack>
             </VStack>
@@ -232,7 +233,8 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
     );
 }
 
-export default Chat;
+export default ChatLog
+
 
 export const getServerSideProps = async (ctx: any) => {
     // Create authenticated Supabase Client
