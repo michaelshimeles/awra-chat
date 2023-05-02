@@ -9,6 +9,7 @@ import {
   Text,
   VStack
 } from "@chakra-ui/react";
+import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { useUser } from "@supabase/auth-helpers-react";
 import dynamic from 'next/dynamic';
 import Head from "next/head";
@@ -18,9 +19,10 @@ const Login = dynamic(() => import('@/components/Login/Login'));
 const SignUp = dynamic(() => import('@/components/SignUp/SignUp'));
 
 interface HomeProps {
+  userServer: any
 }
 
-const Home: React.FC<HomeProps> = ({ }) => {
+const Home: React.FC<HomeProps> = ({ userServer }) => {
 
   const router = useRouter()
   const user = useUser()
@@ -68,3 +70,29 @@ const Home: React.FC<HomeProps> = ({ }) => {
 
 export default Home;
 
+export const getServerSideProps = async (ctx: any) => {
+  // Create authenticated Supabase Client
+  const supabase = createServerSupabaseClient(ctx);
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+
+  if (!session)
+    return {
+      props: {
+        userServer: null,
+      },
+    };
+
+  // Run queries with RLS on the server
+
+
+  return {
+    props: {
+      initialSession: session,
+      userServer: session.user,
+    },
+  };
+};
