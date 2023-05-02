@@ -135,7 +135,7 @@ export const ChatLog: React.FC<ChatProps> = ({ data, children }) => {
     const supabase = useSupabaseClient()
     const router = useRouter()
 
-    console.log("Query", router.query.id)
+    console.log("Query", router?.query?.id)
 
     const handleChatSelection = (chats: any) => {
         router.push("/chat/" + chats?.room_id)
@@ -153,7 +153,7 @@ export const ChatLog: React.FC<ChatProps> = ({ data, children }) => {
         const { data: sendingMessageData, error } = await supabase
             .from('chatmessages')
             .insert({
-                room_id: selectedChat?.room_id,
+                room_id: router?.query?.id,
                 user_id: userId,
                 message: message
             });
@@ -169,7 +169,7 @@ export const ChatLog: React.FC<ChatProps> = ({ data, children }) => {
     }
 
     const handleBorderSelect = () => {
-        setHighlightedChat(router.query.id)
+        setHighlightedChat(router?.query?.id)
     }
 
     if (!data)
@@ -213,12 +213,12 @@ export const ChatLog: React.FC<ChatProps> = ({ data, children }) => {
                         </VStack>
                     </Show>
                     {<VStack w="80%">
-                        <ChatHistory chatRoom={router.query.id} roomId={router.query.id} userId={data?.[0]?.user_id} audio={audio} />
+                        <ChatHistory chatRoom={router?.query?.id} roomId={router?.query?.id} userId={data?.[0]?.user_id} audio={audio} />
                         <VStack w="full">
                             <Box w="100%">
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <HStack w="full">
-                                        <VoiceRecording roomId={selectedChat} userId={data?.[0]?.user_id} audioFile={setAudio} />
+                                        <VoiceRecording roomId={router?.query?.id} userId={data?.[0]?.user_id} audioFile={setAudio} />
                                         <Textarea rounded="none" {...register("chatMessage", { required: true })} />
                                         <Button type="submit" rounded="none" variant="outline" h="5rem">Send</Button>
                                     </HStack>
