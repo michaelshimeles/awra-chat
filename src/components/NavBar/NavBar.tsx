@@ -38,6 +38,7 @@ const NavBar: React.FC<NavBarProps> = ({ }) => {
         return;
     };
 
+
     return (
         <HStack w="100%" p="1rem" justify="flex-end">
             {user &&

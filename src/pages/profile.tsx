@@ -244,10 +244,6 @@ const Profile: React.FC<profileProps> = ({ user, data }) => {
     const supabase = useSupabaseClient();
     const router = useRouter();
 
-
-    function handleRefresh() {
-        refreshRouter.reload()
-    }
     if (!user)
         return (
             <Protected title="Protected Route" info="This is a protected route" forward='/' />

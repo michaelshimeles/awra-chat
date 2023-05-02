@@ -12,10 +12,7 @@ interface ChatListProps {
 const ChatList: React.FC<ChatListProps> = ({ roomId, data, highlightedChat }) => {
 
     const [chatHistory, setChatHistory] = useState<any>(null)
-    const [selected, setSelected] = useState<any>(null)
-
     const supabase = useSupabaseClient()
-
     useEffect(() => {
         getChatInfo()
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -49,9 +46,6 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data, highlightedChat }) =>
         if (profile) return profile[0]?.username
     }
 
-    // const handleChatSelection = () => {
-    //     setSelected(true)
-    // }
 
     return (
         <VStack w="full">

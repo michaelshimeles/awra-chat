@@ -115,10 +115,10 @@ const VoiceRecording: React.FC<VoiceRecordingProps> = ({ roomId, userId, audioFi
         <VStack>
             <VStack>
                 {permission && recordingStatus === "inactive" ? (
-                    <Icon onClick={startRecording} type="button" as={BiMicrophone} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.100" rounded="full" />
+                    <Icon boxSize={6} onClick={startRecording} type="button" as={BiMicrophone} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.50" rounded="full" />
                 ) : null}
                 {recordingStatus === "recording" ? (
-                    <Icon onClick={stopRecording} type="button" as={BsStopCircle} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.100" rounded="full" />
+                    <Icon boxSize={6} onClick={stopRecording} type="button" as={BsStopCircle} cursor="pointer" border="1px solid" borderColor="gray.900" bgColor="whiteAlpha.50" rounded="full" color="red"/>
                 ) : null}
             </VStack>
         </VStack>
@@ -220,7 +220,7 @@ export const Chat: React.FC<ChatProps> = ({ data, children }) => {
                                 </form>
                             </Box>
                         </VStack>
-                    </VStack> : <VStack>
+                    </VStack> : <VStack w="100%" justify="center" h="7rem">
                         <Center>
                             <Heading>No chat selected</Heading>
                         </Center>

@@ -26,6 +26,7 @@ const Home: React.FC<HomeProps> = ({ userServer }) => {
 
   const router = useRouter()
   const user = useUser()
+
   
   return (
     <Layout>

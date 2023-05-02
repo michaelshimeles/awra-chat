@@ -55,14 +55,17 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ chatRoom, userId, audio, room
         const { data, error } = await supabase
             .from('chatmessages')
             .select(`
-          *
+          *,
+          profile (
+            *
+          )
         `)
             .eq('room_id', roomId)
             .order('created_at', { ascending: true })
 
         if (data) {
+            console.log("Date", data)
             setChatHistory(data)
-            getUserInfo()
             return data
         }
 
@@ -70,28 +73,6 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ chatRoom, userId, audio, room
             console.log(error)
             return error
         }
-    }
-
-    const getUserInfo = async () => {
-        chatRoom?.group_users_id?.map(async (user: string) => {
-            const { data, error } = await supabase
-                .from('profile')
-                .select(`
-          *
-        `)
-                .eq('user_id', user)
-
-            if (data) {
-                setUserInfo([...userInfo, data])
-                return data
-            }
-
-            if (error) {
-                console.log(error)
-                return error
-            }
-        })
-
     }
 
     const base64toBlob = (base64Data: string) => {
@@ -121,9 +102,9 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ chatRoom, userId, audio, room
                         {(chat?.user_id) !== (userId) ?
 
                             <VStack w="100%" align="flex-start">
-                                <Text fontSize="xx-small">{chat?.user_id}</Text>
+                                <Text fontSize="xx-small">{chat?.profile?.username}</Text>
                                 <HStack p="0.5rem" border="1px solid" borderColor="gray.900" rounded="xl" bgColor="black">
-                                    <Avatar size="sm" />
+                                    <Avatar size="sm" src={chat?.profile?.profile_img} />
                                     <HStack>
                                         {chat?.audio ? <audio src={base64toBlob(chat?.message)} controls style={audioStyle}></audio> : <Text fontSize="sm">{chat?.message}</Text>}
                                         <Text fontSize="xx-small">{new Date(chat?.created_at).toLocaleTimeString() + " " + new Date(chat?.created_at).toLocaleDateString()}</Text>
@@ -133,9 +114,9 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ chatRoom, userId, audio, room
                             :
                             <VStack w="100%" align="flex-end">
                                 <VStack align="flex-start">
-                                    <Text fontSize="xx-small">{chat?.user_id}</Text>
+                                    <Text fontSize="xx-small">{chat?.profile?.username}</Text>
                                     <HStack p="0.5rem" border="1px solid" borderColor="gray.900" rounded="xl" bgColor="black">
-                                        <Avatar size="sm" />
+                                        <Avatar size="sm" src={chat?.profile?.profile_img} />
                                         <HStack>
                                             {chat?.audio ? <audio src={base64toBlob(chat?.message)} controls style={audioStyle}></audio> : <Text fontSize="sm">{chat?.message}</Text>}
                                             <Text fontSize="xx-small">{new Date(chat?.created_at).toLocaleTimeString() + " " + new Date(chat?.created_at).toLocaleDateString()}</Text>
