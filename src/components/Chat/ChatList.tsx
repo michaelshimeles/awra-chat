@@ -2,6 +2,7 @@ import { HStack, Heading, VStack } from '@chakra-ui/react';
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+// import { useGetChatInfo } from '@/hooks/useGetChatInfo';
 
 interface ChatListProps {
     roomId: string
@@ -19,6 +20,7 @@ const ChatList: React.FC<ChatListProps> = ({ roomId, data, highlightedChat }) =>
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
+    // const {data: ChatH} = useGetChatInfo(roomId)
     const getChatInfo = async () => {
 
         const { data: chatInfo, error } = await supabase

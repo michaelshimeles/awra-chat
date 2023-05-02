@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 function fetchChatInfo(roomId: string) {
+  console.log("roomId", roomId)
   return axios
     .get(`${process.env.NEXT_PUBLIC_URL}/api/getChatInfo`, {
       params: {
