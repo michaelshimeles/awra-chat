@@ -17,7 +17,6 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ chatRoom, userId, audio, room
 
     const supabase = useSupabaseClient()
     const [chatHistory, setChatHistory] = useState<any>([])
-    const [userInfo, setUserInfo] = useState<any>([])
     const chatHistoryRef = useRef<HTMLDivElement>(null);
 
     const audioElement = document.createElement('audio');
@@ -35,7 +34,7 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ chatRoom, userId, audio, room
                     console.log("Event type", payload.eventType)
 
                     getMessages()
-                    if (payload?.new && typeof payload.new === 'object' && 'user_id' in payload.new && payload.new.user_id !== userId) {
+                    if (payload?.new && typeof payload.new === 'object' && 'user_id' in payload.new && payload.new.user_id !== userId && payload.new.room_id !== roomId) {
                         audioElement.play();
                     }
                 }
@@ -64,7 +63,6 @@ const ChatHistory: React.FC<ChatHistoryProps> = ({ chatRoom, userId, audio, room
             .order('created_at', { ascending: true })
 
         if (data) {
-            console.log("Date", data)
             setChatHistory(data)
             return data
         }
